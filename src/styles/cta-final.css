@@ -1,0 +1,81 @@
+.cta-final {
+  background: var(--carbon);
+  padding-block: var(--section-py);
+}
+
+.cta-final__inner {
+  text-align: center;
+  max-width: 680px;
+  margin-inline: auto;
+}
+
+.cta-final__eyebrow {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.cta-final__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-40);
+  font-weight: 700;
+  color: var(--white);
+  line-height: var(--leading-snug);
+  margin-bottom: var(--space-6);
+}
+
+.cta-final__sub {
+  font-size: var(--text-16);
+  color: rgba(255, 255, 255, 0.65);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-10);
+}
+
+.cta-final__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+/* White button, teal text — intentional inversion on dark bg */
+.cta-final__btn-primary {
+  background: var(--white);
+  color: var(--teal);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  font-weight: 700;
+  padding: 0.875rem 2rem;
+  border-radius: var(--radius-btn);
+  border: none;
+  cursor: pointer;
+  transition: opacity var(--duration-fast);
+}
+.cta-final__btn-primary:hover { opacity: 0.9; }
+
+.cta-final__btn-secondary {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  font-weight: 500;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  padding: 0.75rem 1.75rem;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  transition: border-color var(--duration-fast), color var(--duration-fast);
+}
+.cta-final__btn-secondary:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: var(--white);
+}
+
+.cta-final__trust {
+  font-size: var(--text-12);
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .cta-final__actions { flex-direction: row; justify-content: center; }
+  .cta-final__title { font-size: var(--text-48); }
+}

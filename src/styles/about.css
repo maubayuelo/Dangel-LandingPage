@@ -1,0 +1,120 @@
+.about {
+  background: var(--cream);
+  padding-block: var(--section-py);
+}
+
+.about__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+.about__photo-col img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--radius-img);
+}
+
+.about__caption {
+  font-size: var(--text-12);
+  color: var(--text-dimmer);
+  text-align: center;
+  margin-top: var(--space-3);
+}
+
+.about__content {
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--space-2);
+}
+
+.about__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-40);
+  font-weight: 700;
+  color: var(--carbon);
+  line-height: var(--leading-snug);
+  margin-bottom: var(--space-8);
+}
+
+.about__body {
+  font-size: var(--text-15);
+  color: var(--text-muted);
+  line-height: var(--leading-relaxed);
+  max-width: 540px;
+  margin-bottom: var(--space-6);
+}
+
+.about__diff {
+  background: var(--white);
+  border-left: 3px solid var(--teal);
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-6);
+  max-width: 540px;
+}
+
+.about__diff p {
+  font-size: var(--text-14);
+  color: var(--carbon);
+  line-height: var(--leading-relaxed);
+}
+
+.about__disciplines {
+  margin-bottom: var(--space-4);
+}
+
+.about__disciplines-label {
+  font-size: var(--text-13);
+  font-weight: 600;
+  color: var(--carbon);
+  margin-bottom: var(--space-3);
+}
+
+.about__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.about__chip {
+  background: var(--white);
+  color: var(--teal);
+  font-size: var(--text-11);
+  font-weight: 500;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-chip);
+}
+
+.about__langs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-10);
+}
+
+.about__lang-tag {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: var(--text-12);
+  padding: 0.375rem 0.875rem;
+}
+
+.about__cta { align-self: flex-start; }
+
+@media (min-width: 1024px) {
+  .about__inner {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--col-gap);
+  }
+
+  .about__photo-col {
+    width: var(--col-photo);
+    flex-shrink: 0;
+  }
+
+  .about__title { font-size: var(--text-44); }
+}

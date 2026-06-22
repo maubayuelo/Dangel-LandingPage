@@ -1,0 +1,109 @@
+.footer {
+  background: var(--carbon);
+  padding-block: var(--space-16) var(--space-8);
+}
+
+.footer__top {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-10);
+  padding-bottom: var(--space-12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer__logo {
+  font-family: var(--font-heading);
+  font-size: var(--text-22);
+  font-weight: 700;
+  color: var(--white);
+  //margin-bottom: var(--space-3);
+}
+
+.footer__tagline {
+  font-size: var(--text-13);
+  color: rgba(255, 255, 255, 0.5);
+  line-height: var(--leading-relaxed);
+  max-width: 240px;
+  margin-bottom: var(--space-2);
+}
+
+.footer__contact-info {
+  margin-top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.footer__contact-info p {
+  font-size: var(--text-12);
+  color: rgba(255, 255, 255, 0.35);
+  white-space: pre-line;
+}
+
+.footer__col-title {
+  font-size: var(--text-11);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: var(--space-2);
+}
+
+.footer__nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.footer__nav-link {
+  font-size: var(--text-13);
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: color var(--duration-fast);
+}
+.footer__nav-link:hover { color: var(--white); }
+
+.footer__social {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.footer__social-link {
+  font-size: var(--text-13);
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: color var(--duration-fast);
+}
+.footer__social-link:hover { color: var(--teal); }
+
+.footer__bottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-8);
+}
+
+.footer__copy {
+  font-size: var(--text-12);
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.footer__legal-link {
+  font-size: var(--text-12);
+  color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: color var(--duration-fast);
+}
+.footer__legal-link:hover { color: rgba(255, 255, 255, 0.6); }
+
+@media (min-width: 768px) {
+  .footer__top { grid-template-columns: 2fr 1fr 1fr; }
+  .footer__bottom { flex-direction: row; justify-content: space-between; align-items: center; }
+}
