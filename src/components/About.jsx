@@ -23,7 +23,6 @@ export default function About({ data: d, onBook }) {
 
           <div className="about__photo-col">
             <img src={photoUrl} alt={photoAlt} loading="lazy" />
-            {d.aboutPhotoCaption && <p className="about__caption">{d.aboutPhotoCaption}</p>}
           </div>
 
           <div className="about__content">

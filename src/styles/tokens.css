@@ -107,6 +107,15 @@
   --ease-default:  ease;
 }
 
+/* ── Mobile spacing overrides ─────────────────── */
+@media (max-width: 767px) {
+  :root {
+    --section-py:   var(--space-12);  /* 48px — half of desktop 96px */
+    --section-gap:  var(--space-8);   /* 32px — half of desktop 64px */
+    --container-pad: var(--space-5);  /* 20px — tighter side padding */
+  }
+}
+
 /* ── Reset minimal ────────────────────────────── */
 *,
 *::before,

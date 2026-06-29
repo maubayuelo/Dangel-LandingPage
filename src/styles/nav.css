@@ -168,7 +168,7 @@
 }
 
 /* ── Breakpoint ───────────────────────────────── */
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .nav__desktop      { display: flex; }
   .nav__mobile-right { display: none; }
 }

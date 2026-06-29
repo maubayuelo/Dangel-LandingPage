@@ -118,3 +118,7 @@
 
   .about__title { font-size: var(--text-44); }
 }
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .about__photo-col img { aspect-ratio: 1 / 1; object-position: center top; }
+}

@@ -111,8 +111,15 @@
 }
 .testimonials__fb-link:hover { text-decoration: underline; }
 
-/* ── Bento grid on desktop — 6-col, 3 rows of 2 ── */
-@media (min-width: 768px) {
+/* ── Tablet: 2-col grid ── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .testimonials__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Desktop: 6-col bento — 3 rows of 2 ── */
+@media (min-width: 1024px) {
   .testimonials__grid {
     grid-template-columns: repeat(6, 1fr);
   }
