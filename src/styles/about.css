@@ -9,6 +9,14 @@
   gap: var(--space-16);
 }
 
+.about__photo-col {
+  order: 2;
+}
+
+.about__content {
+  order: 1;
+}
+
 .about__photo-col img {
   width: 100%;
   aspect-ratio: 3 / 4;
@@ -39,9 +47,9 @@
 }
 
 .about__body {
-  font-size: var(--text-15);
+  font-size: var(--text-16);
   color: var(--text-muted);
-  line-height: var(--leading-relaxed);
+  line-height: 1.7;
   max-width: 540px;
   margin-bottom: var(--space-6);
 }
@@ -55,9 +63,9 @@
 }
 
 .about__diff p {
-  font-size: var(--text-14);
+  font-size: var(--text-16);
   color: var(--carbon);
-  line-height: var(--leading-relaxed);
+  line-height: 1.7;
 }
 
 .about__disciplines {
@@ -112,8 +120,13 @@
   }
 
   .about__photo-col {
+    order: unset;
     width: var(--col-photo);
     flex-shrink: 0;
+  }
+
+  .about__content {
+    order: unset;
   }
 
   .about__title { font-size: var(--text-44); }

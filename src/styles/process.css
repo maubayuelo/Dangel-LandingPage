@@ -50,9 +50,9 @@
 }
 
 .process__step-desc {
-  font-size: var(--text-14);
+  font-size: var(--text-16);
   color: var(--text-muted);
-  line-height: var(--leading-relaxed);
+  line-height: 1.7;
 }
 
 @media (min-width: 1024px) {

@@ -6,47 +6,66 @@ Landing page for **Dangel, Thérapeute Holistique**. A single-page marketing sit
 
 ## What This Project Is
 
-The site has no database of its own. All text, images, and settings live inside a **WordPress** installation running locally (via Local by Flywheel). React fetches that content through a **GraphQL API** (provided by the WPGraphQL plugin) and renders it as a fast, static-feeling landing page.
+The site has no database of its own. All text, images, and settings live inside a **WordPress** installation. React fetches that content through a **GraphQL API** (provided by the WPGraphQL plugin) and renders it as a fast, modern landing page.
+
+```
+WordPress Admin (client edits content)
+       ↓  ACF Pro (structured fields)
+  WPGraphQL (exposes fields as GraphQL API)
+       ↓  one HTTP request
+  Apollo Client (caches and delivers to React)
+       ↓  props
+  Section Components (render the HTML)
+```
 
 Think of it this way:
 - **WordPress** = where the client edits content (text, photos, settings)
-- **GraphQL** = the bridge that delivers that content as structured data
-- **React** = what turns that data into the webpage visitors see
+- **GraphQL** = the bridge that delivers that content as structured JSON
+- **Apollo Client** = the smart fetcher that caches responses
+- **React** = what turns that JSON into the webpage visitors see
+
+---
+
+## Tech Stack
+
+| Layer | Technology | Why |
+|---|---|---|
+| UI framework | React 19 | Component model, hooks, reactive state |
+| Build tool | Vite 8 | Fast dev server, optimized production builds |
+| Data fetching | Apollo Client 3 | GraphQL client with caching |
+| CMS | WordPress + WPGraphQL + ACF Pro | Client-editable content via GraphQL |
+| Styling | Plain CSS + custom properties | No Tailwind, no CSS-in-JS |
+| Form delivery | EmailJS | Client-side form sending, no backend needed |
+| Analytics | GA4 + Meta Pixel | Loaded dynamically from WP Admin |
+| i18n | WPML + custom useLanguage hook | FR / EN / ES via separate WP pages |
 
 ---
 
 ## Prerequisites
 
-Before you can run this project you need two things running on your machine:
+Before you can run this project you need two things:
 
-### 1. Local by Flywheel (WordPress)
-The WordPress site is named **dangelwellness** and must be running in [Local by Flywheel](https://localwp.com/) before the React app will load any content.
+### 1. WordPress CMS
+Content is fetched from the live production GraphQL endpoint: `https://cms.dangelwellness.ca/graphql`
 
-- Open Local → start the **dangelwellness** site
-- WordPress admin: `http://dangelwellness.local/wp-admin`
-- GraphQL endpoint: `http://dangelwellness.local/graphql`
+For local development, change the URI in [src/graphql/client.js](src/graphql/client.js) to `http://dangelwellness.local/graphql` and start the **dangelwellness** site in [Local by Flywheel](https://localwp.com/).
 
 ### 2. Node.js
-Install [Node.js](https://nodejs.org/) (v18 or later). This lets you run the React development server.
+Install [Node.js](https://nodejs.org/) v18 or later.
 
 ---
 
 ## Getting Started
 
 ```bash
-# 1. Go into the project folder
-cd landing-page-dangel
-
-# 2. Install dependencies (only needed once)
+# Install dependencies (only needed once)
 npm install
 
-# 3. Start the development server
+# Start the development server
 npm run dev
 ```
 
-Then open your browser at `http://localhost:5173`.
-
-> The page will be blank or show a GraphQL error if the Local WordPress site is not running.
+Open `http://localhost:5173` in your browser.
 
 ---
 
@@ -54,118 +73,113 @@ Then open your browser at `http://localhost:5173`.
 
 ```
 landing-page-dangel/
-├── index.html                  # HTML shell — lang="fr", page title
-├── vite.config.js              # Vite bundler config
-├── package.json                # Dependencies and scripts
+├── index.html                  # HTML shell — SEO meta tags, GA4 script, <div id="root">
+├── vite.config.js              # Vite bundler configuration
+├── package.json                # Dependencies and npm scripts
+├── public/
+│   ├── robots.txt              # Allows AI crawlers (GPTBot, ClaudeBot, PerplexityBot)
+│   ├── sitemap.xml             # All three language URLs for search engines
+│   └── llms.txt                # AI-readable site description (for ChatGPT, Perplexity, etc.)
 └── src/
-    ├── main.jsx                # Entry point — wraps app with Apollo (GraphQL) provider
-    ├── App.jsx                 # Root component — one GraphQL query, passes data to sections
+    ├── main.jsx                # Entry — ReactDOM.createRoot, ApolloProvider wraps App
+    ├── App.jsx                 # Root — ONE useQuery, distributes data as props to sections
     ├── graphql/
-    │   ├── client.js           # Apollo Client setup pointing to WP GraphQL endpoint
-    │   └── queries.js          # The single GET_PAGE query that fetches all content
+    │   ├── client.js           # Apollo Client instance (HTTP link + InMemoryCache)
+    │   └── queries.js          # GET_PAGE master query (all content in one request)
+    ├── hooks/
+    │   ├── useLanguage.js      # Custom hook — URL path > localStorage > 'en' priority
+    │   └── useAnalytics.js     # Custom hook — injects Meta Pixel + GA4 scripts on demand
     ├── components/             # One file per page section
-    │   ├── Nav.jsx
-    │   ├── Hero.jsx
-    │   ├── Benefits.jsx
-    │   ├── Services.jsx
-    │   ├── Process.jsx
-    │   ├── About.jsx
-    │   ├── Testimonials.jsx
-    │   ├── FAQ.jsx
-    │   ├── Contact.jsx
-    │   ├── CtaFinal.jsx
-    │   └── Footer.jsx
-    └── styles/                 # One CSS file per component + shared tokens
-        ├── tokens.css          # ALL design variables (colors, fonts, spacing, radii)
-        ├── nav.css
-        ├── hero.css
-        ├── benefits.css
-        ├── services.css
-        ├── process.css
-        ├── about.css
-        ├── testimonials.css
-        ├── faq.css
-        ├── contact.css
-        ├── cta-final.css
-        └── footer.css
+    │   ├── Nav.jsx             # Sticky nav, hamburger menu, language switcher
+    │   ├── Hero.jsx            # Above-the-fold, stripOuterP() for WP headline HTML
+    │   ├── Benefits.jsx        # 5-card bento grid
+    │   ├── Services.jsx        # 3-column service cards with technique tags
+    │   ├── Process.jsx         # 3-step how-it-works cards
+    │   ├── About.jsx           # 2-col photo + bio, discipline chips
+    │   ├── Testimonials.jsx    # 6-card grid, "Translated from" language labels
+    │   ├── FAQ.jsx             # Accordion — useState controls which item is open
+    │   ├── Contact.jsx         # Info column + EmailJS form
+    │   ├── CtaFinal.jsx        # Dark section, final booking CTA
+    │   ├── Footer.jsx          # Dark section, receives data + global props
+    │   └── BookingModal.jsx    # iframe modal, focus trap, Esc/backdrop close
+    └── styles/
+        ├── tokens.css          # ALL design tokens (colors, fonts, spacing, radii)
+        └── [section].css       # One CSS file per component, mobile-first
 ```
 
 ---
 
-## How Content Flows
+## How Data Flows (One-Way, Top-Down)
 
 ```
-WordPress Admin (client edits content)
-        ↓
-  ACF Pro field groups (structured fields per section)
-        ↓
-  WPGraphQL plugin (exposes fields as GraphQL API)
-        ↓
-  GET_PAGE query in queries.js (fetches everything at once)
-        ↓
-  App.jsx (distributes data as props to each section)
-        ↓
-  Section components (render the HTML)
+App.jsx
+ useQuery(GET_PAGE)
+  ↓ data.page
+  ├── p.fgNavigation  →  <Nav data={...} />
+  ├── p.fgGlobal      →  <Footer global={...} />  +  useAnalytics()  +  SEO useEffect
+  ├── p.fgHero        →  <Hero data={...} />
+  ├── p.fgBenefits    →  <Benefits data={...} />
+  ├── p.fgServices    →  <Services data={...} />
+  ├── p.fgProcess     →  <Process data={...} />
+  ├── p.fgAbout       →  <About data={...} />
+  ├── p.fgTestimonials→  <Testimonials data={...} />
+  ├── p.fgFaq         →  <FAQ data={...} />
+  ├── p.fgContact     →  <Contact data={...} />
+  ├── p.fgCtaFinal    →  <CtaFinal data={...} />
+  └── p.fgFooter      →  <Footer data={...} />
 ```
 
-### Key rule: data flows top-down
-`App.jsx` runs **one** GraphQL query for the entire page. It then passes each section's data down as a `data` prop. No component fetches its own data. This means:
-
-```jsx
-// App.jsx
-<Hero data={p?.fgHero} />
-<Benefits data={p?.fgBenefits} />
-
-// Hero.jsx — receives data as a prop, never calls useQuery
-export default function Hero({ data: h }) { ... }
-```
+**Rule:** No component ever calls `useQuery` directly. All data enters through `App.jsx` and flows down via props.
 
 ---
 
 ## WordPress ACF Field Groups
 
-Content is organized into **12 ACF (Advanced Custom Fields) field groups**, each prefixed `fg_` and attached to the WordPress page with the slug `home`.
+12 ACF field groups attached to the WordPress page slug `home` (and its WPML translations).
 
-| GraphQL name | WP field group | Section |
+| GraphQL name | WP field group | Notes |
 |---|---|---|
-| `fgNavigation` | `fg_navigation` | Top nav bar |
-| `fgGlobal` | `fg_global` | Site-wide info (phone, email, address) |
-| `fgHero` | `fg_hero` | Hero / above the fold |
-| `fgBenefits` | `fg_benefits` | Why choose Dangel (5 cards) |
-| `fgServices` | `fg_services` | Service offerings |
-| `fgProcess` | `fg_process` | How it works (3 steps) |
-| `fgAbout` | `fg_about` | About / bio section |
-| `fgTestimonials` | `fg_testimonials` | Client reviews (6 cards) |
-| `fgFaq` | `fg_faq` | Frequently asked questions |
-| `fgContact` | `fg_contact` | Contact info + form |
-| `fgCtaFinal` | `fg_cta_final` | Final call to action (dark section) |
-| `fgFooter` | `fg_footer` | Footer links and copyright |
-
-### Repeater fields
-Some fields are **repeaters** (lists), like `benefitsItems`, `servicesItems`, `faqItems`. In GraphQL these return as plain arrays — not wrapped in `nodes`. Always access them directly and default to `[]` to avoid crashes when empty:
-
-```js
-const items = d.benefitsItems || []
-```
+| `fgNavigation` | `fg_navigation` | `navLinks` repeater: `{ nlLabel, nlAnchor }` |
+| `fgGlobal` | `fg_global` | Phone, email, address, booking URL, SEO fields, analytics IDs |
+| `fgHero` | `fg_hero` | `heroHeadline` contains HTML `<em>` — use `stripOuterP()` |
+| `fgBenefits` | `fg_benefits` | `benefitsItems` repeater: `{ benNumber, benTitle, benDescription }` |
+| `fgServices` | `fg_services` | `servicesItems` repeater, `svTechniqueTags` split by comma/newline |
+| `fgProcess` | `fg_process` | `processSteps` repeater: `{ psNumber, psTitle, psDescription }` |
+| `fgAbout` | `fg_about` | `aboutDisciplinesList` is HTML `<ul><li>` — parsed by `parseListItems()` |
+| `fgTestimonials` | `fg_testimonials` | `tsOriginalLang` drives "Translated from" labels |
+| `fgFaq` | `fg_faq` | Note: `fgFaq` not `fgFAQ` — WPGraphQL lowercases after acronyms |
+| `fgContact` | `fg_contact` | `contactScheduleItems` repeater: `{ scDay, scHours }` |
+| `fgCtaFinal` | `fg_cta_final` | Only 3 fields — do not add non-existent fields |
+| `fgFooter` | `fg_footer` | `footerNavItems` + `footerSocialItems` repeaters |
 
 ---
 
-## Styling Rules
+## Coding Conventions
 
-- **No Tailwind, no CSS-in-JS.** Plain CSS only.
-- All design tokens (colors, fonts, spacing, border radii, motion) live in `src/styles/tokens.css` as CSS custom properties (`--variable-name`).
-- Every component imports only its own CSS file.
-- Styles are **mobile-first**: base styles target small screens, `@media (min-width: ...)` overrides handle larger screens.
+### Every section component follows this pattern
+```jsx
+export default function SectionName({ data: d }) {
+  if (!d) return null                    // guard: no data → render nothing
+  const items = d.repeatField || []     // safe default for repeater arrays
 
-### Key tokens
-```css
---cream:        #F7F4EE;   /* main background */
---cream-light:  #FDFCFA;   /* alternate section background */
---carbon:       #1C1C1A;   /* dark background (CtaFinal, Footer) */
---teal:         #3D8E8A;   /* primary accent / brand color */
---font-heading: 'Playfair Display', serif;
---font-body:    'DM Sans', sans-serif;
+  return (
+    <section className="section-name" id="anchor">
+      {/* JSX here */}
+    </section>
+  )
+}
 ```
+
+### CSS rules
+- **No Tailwind, no CSS-in-JS.** Plain CSS with custom properties only.
+- All tokens live in `tokens.css` — never hardcode colors or spacing in component CSS.
+- **Mobile-first:** base styles = mobile, `@media (min-width: 768px)` = tablet, `@media (min-width: 1024px)` = desktop.
+- BEM-ish naming: `.section__element`, `.section__element--modifier`.
+
+### GraphQL rules
+- Every field in `queries.js` **must exist** in WordPress ACF. One non-existent field breaks the entire page.
+- ACF field names are `snake_case` in WP; WPGraphQL converts them to `camelCase` in GraphQL.
+- `fgFAQ` → `fgFaq` (WPGraphQL lowercases after acronyms).
 
 ---
 
@@ -179,16 +193,69 @@ const items = d.benefitsItems || []
 
 ---
 
+## Multilanguage
+
+Language detection priority (highest to lowest):
+1. **URL path** — `/fr` shows French, `/es` shows Spanish. Used for ad campaign links.
+2. **localStorage** — remembers last user selection across visits.
+3. **Default** — `en` (English).
+
+Each language version is a **separate WordPress page** managed by WPML:
+- English: `/home/`
+- French: `/fr/accueil/`
+- Spanish: `/es/inicio/`
+
+---
+
+## SEO & AI Discoverability
+
+- **`index.html`** — primary/OG/Twitter meta tags + GA4 script (static fallback)
+- **`public/robots.txt`** — allows all crawlers including GPTBot, ClaudeBot, PerplexityBot
+- **`public/sitemap.xml`** — all 3 language URLs with `hreflang` attributes
+- **`public/llms.txt`** — plain-text site summary for AI answer engines (ChatGPT, Perplexity)
+- **JSON-LD in `index.html`** — `LocalBusiness` schema with full service catalog + `Person` schema
+- **Dynamic SEO from WP** — `globalSeoTitle` and `globalSeoDescription` in `fgGlobal` override meta tags at runtime via `useEffect` in `App.jsx`
+
+---
+
+## Deployment
+
+```bash
+npm run build          # generates /dist
+```
+
+Upload the entire `/dist` folder to `dangelwellness.ca/public_html/`. The `.htaccess` file inside `/dist` handles SPA routing on Apache (all routes return `index.html`).
+
+---
+
 ## Common Issues
 
-**Page is blank / "GraphQL error"**
-→ The Local WordPress site is not running. Open Local by Flywheel and start the dangelwellness site.
+| Symptom | Cause | Fix |
+|---|---|---|
+| Blank page / "GraphQL error" | Queried a field that doesn't exist in WP | Remove the field from `queries.js` |
+| Section is empty | ACF fields not filled in WP Admin | Fill content in Pages → Home |
+| Images show placeholder | `heroPhoto` / `aboutPhoto` not set in WP | Upload image in WP Admin → Media |
+| `useQuery` not exported | Apollo Client v4 breaks this export | Project pins `@apollo/client@^3.x` |
+| Stale bundle after package changes | Vite caches aggressively | `rm -rf node_modules/.vite` then restart |
+| `fgFAQ` returns null | WPGraphQL lowercases after acronym | Use `fgFaq` (lowercase q) |
 
-**Content shows but images are placeholders**
-→ Images haven't been uploaded yet in WordPress Admin → Media or inside the ACF fields.
+---
 
-**A section is empty**
-→ The ACF fields for that section haven't been filled in WordPress Admin → Pages → Home.
+## Key JavaScript / React Concepts Used
 
-**Styles look broken after editing tokens.css**
-→ Make sure your variable name matches exactly (CSS variables are case-sensitive).
+| Concept | Where to see it |
+|---|---|
+| `useState` | `App.jsx` (modal), `FAQ.jsx` (accordion), `Contact.jsx` (form), `Nav.jsx` (mobile menu) |
+| `useEffect` | `App.jsx` (SEO tags), `BookingModal.jsx` (focus, Esc key, body scroll) |
+| `useRef` | `BookingModal.jsx` (DOM focus management) |
+| Custom hooks | `src/hooks/useLanguage.js`, `src/hooks/useAnalytics.js` |
+| `useQuery` (Apollo) | `App.jsx` only |
+| Props + destructuring | Every component: `({ data: d, onBook })` |
+| Optional chaining `?.` | Everywhere: `h.heroPhoto?.node?.sourceUrl` |
+| Nullish coalescing `??` / OR `\|\|` | Everywhere: `d.faqItems \|\| []` |
+| `Array.map()` | Every list/repeater: `items.map((item, i) => ...)` |
+| Conditional rendering | `{condition && <JSX>}` and `{cond ? a : b}` |
+| `dangerouslySetInnerHTML` | `Hero.jsx` (headline HTML from WP) |
+| Event listener cleanup | `BookingModal.jsx`, `useLanguage.js` |
+| Focus trap | `BookingModal.jsx` |
+| `history.pushState` | `useLanguage.js` (URL-based language switching) |

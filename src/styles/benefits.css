@@ -42,7 +42,7 @@
 }
 
 .benefits__card-title {
-  font-size: var(--text-15);
+  font-size: var(--text-16);
   font-weight: 600;
   color: var(--carbon);
   margin-bottom: var(--space-2);
@@ -50,9 +50,9 @@
 }
 
 .benefits__card-desc {
-  font-size: var(--text-13);
+  font-size: var(--text-16);
   color: var(--text-muted);
-  line-height: var(--leading-relaxed);
+  line-height: 1.7;
 }
 
 @media (min-width: 640px) {

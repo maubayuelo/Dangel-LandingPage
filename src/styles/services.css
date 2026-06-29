@@ -87,9 +87,9 @@
 }
 
 .services__desc {
-  font-size: var(--text-13);
+  font-size: var(--text-16);
   color: var(--text-muted);
-  line-height: var(--leading-relaxed);
+  line-height: 1.7;
   flex: 1;
   margin-bottom: var(--space-6);
 }
@@ -101,13 +101,13 @@
 }
 
 .services__meta {
-  font-size: var(--text-12);
+  font-size: var(--text-14);
   color: var(--text-muted);
 }
 
 .services__book {
   font-family: var(--font-body);
-  font-size: var(--text-13);
+  font-size: var(--text-16);
   font-weight: 600;
   color: var(--teal);
   background: none;

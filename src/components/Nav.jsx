@@ -11,8 +11,10 @@ export default function Nav({ data: d, lang, onLangChange, onBook }) {
 
   const scrollTo = (anchor) => {
     const id = anchor.replace('#', '')
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
     setOpen(false)
+    setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 50)
   }
 
   return (

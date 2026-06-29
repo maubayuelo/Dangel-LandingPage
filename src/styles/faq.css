@@ -35,7 +35,7 @@
 }
 
 .faq__question span {
-  font-size: var(--text-15);
+  font-size: var(--text-16);
   color: var(--carbon);
   line-height: var(--leading-snug);
 }
@@ -51,7 +51,7 @@
   padding-bottom: var(--space-5);
 }
 .faq__answer p {
-  font-size: var(--text-14);
+  font-size: var(--text-16);
   color: var(--text-muted);
-  line-height: var(--leading-relaxed);
+  line-height: 1.7;
 }
