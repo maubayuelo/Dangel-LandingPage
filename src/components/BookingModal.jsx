@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// components/BookingModal.jsx — BOOKING MODAL WITH IFRAME
+// STEP 14 — components/BookingModal.jsx — BOOKING MODAL WITH IFRAME
 //
 // KEY CONCEPTS IN THIS FILE:
 //   - useRef: access a real DOM element from React code

@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// hooks/useLanguage.js — CUSTOM HOOK: LANGUAGE DETECTION & PERSISTENCE
+// STEP 7a — hooks/useLanguage.js — CUSTOM HOOK: LANGUAGE DETECTION & PERSISTENCE
 //
 // WHAT IS A CUSTOM HOOK?
 // A custom hook is just a JavaScript function whose name starts with "use".

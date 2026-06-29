@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// components/FAQ.jsx — FREQUENTLY ASKED QUESTIONS (accordion)
+// STEP 12 — components/FAQ.jsx — FREQUENTLY ASKED QUESTIONS (accordion)
 //
 // KEY CONCEPTS IN THIS FILE:
 //   - useState for UI state (which item is open)

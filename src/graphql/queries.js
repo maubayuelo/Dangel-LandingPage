@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// graphql/queries.js — GRAPHQL QUERY DEFINITIONS
+// STEP 4 — graphql/queries.js — GRAPHQL QUERY DEFINITIONS
 //
 // This file defines the shape of the data we ask WordPress for.
 //

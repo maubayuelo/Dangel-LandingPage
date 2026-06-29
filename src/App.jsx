@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// App.jsx — ROOT COMPONENT / DATA ORCHESTRATOR
+// STEP 6 — App.jsx — ROOT COMPONENT / DATA ORCHESTRATOR
 //
 // This is the brain of the application. It does two main jobs:
 //   1. Fetches ALL page content from WordPress with a single GraphQL query

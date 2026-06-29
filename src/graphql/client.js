@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// graphql/client.js — APOLLO CLIENT CONFIGURATION
+// STEP 3 — graphql/client.js — APOLLO CLIENT CONFIGURATION
 //
 // Apollo Client is the library that handles all communication with the
 // WordPress GraphQL API. Think of it as a smart HTTP client that:

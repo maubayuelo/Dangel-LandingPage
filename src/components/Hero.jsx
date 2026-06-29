@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// components/Hero.jsx — HERO SECTION (above the fold)
+// STEP 10 — components/Hero.jsx — HERO SECTION (above the fold)
 //
 // COMPONENT ANATOMY:
 // Every section component in this project follows the same pattern:

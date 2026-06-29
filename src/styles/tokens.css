@@ -1,3 +1,22 @@
+/*
+  STEP 2 — styles/tokens.css — DESIGN TOKENS (single source of truth)
+
+  Build this file BEFORE writing any component CSS. Every color, font, spacing
+  value, border radius and motion duration lives here as a CSS custom property
+  (--variable-name). Component CSS files ONLY reference these variables — never
+  hardcode values like #3D8E8A or 1rem directly in a component file.
+
+  WHY TOKENS?
+  - Change --teal once → updates every button, link, and accent across the site
+  - Enforce consistency: designers and developers speak the same language
+  - This file is the CSS equivalent of a design system or style guide
+
+  This file is imported FIRST in main.jsx so all variables are available to
+  every component stylesheet that loads after it.
+*/
+
+/* Google Fonts loaded via CSS @import — makes Playfair Display and DM Sans
+   available as font-family values anywhere in the app */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
 
 :root {

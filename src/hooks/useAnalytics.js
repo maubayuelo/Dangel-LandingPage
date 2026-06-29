@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// hooks/useAnalytics.js — CUSTOM HOOK: META PIXEL + GOOGLE ANALYTICS 4
+// STEP 7b — hooks/useAnalytics.js — CUSTOM HOOK: META PIXEL + GOOGLE ANALYTICS 4
 //
 // WHY USE A HOOK FOR ANALYTICS?
 // Analytics scripts need to be injected into the <head> dynamically — after
