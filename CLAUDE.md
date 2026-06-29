@@ -194,10 +194,31 @@ Before adding a field to the query, confirm it exists in WP Admin → Custom Fie
 
 ## Phase Scope
 
-**Phase 2 (current — complete):** All 11 sections built and wired to WPGraphQL.
+**Phase 2 (complete):** All 11 sections built and wired to WPGraphQL.
 
-**Not built (Phase 3):**
-- Language switching (FR / EN / ES) — nav buttons are UI-only stubs
-- Booking modal (`fgGlobal` has `globalBookingUrl` for when ready)
-- Analytics
-- Form backend (Contact form currently shows a UI-only sent confirmation state)
+**Phase 3 (complete):** Multilanguage, booking modal, analytics hooks.
+
+### Multilanguage
+- `src/hooks/useLanguage.js` — priority order: URL `?lang=xx` > localStorage > `en` (default).
+- Language is uppercase when passed to GraphQL: `lang.toUpperCase()` → `EN`, `FR`, `ES`.
+- The `GET_PAGE` query accepts `$language: LanguageCodeFilterEnum` — requires **WPML + WPGraphQL WPML** plugins installed and configured in WordPress.
+- `heroPhoto` and `aboutPhoto` are media fields — they don't change between languages (WPML doesn't translate media by default, which is correct here).
+- Meta Ads campaigns can link directly to `?lang=fr` / `?lang=es` — URL always wins over localStorage.
+
+### Booking Modal
+- `src/components/BookingModal.jsx` — wraps an `<iframe>` to the booking URL.
+- URL source: `fgGlobal.globalBookingUrl` from WP. Fallback (if field empty): `https://dangeltherapeuteholistique.datedechoix.com/main.php`.
+- Open state lives in `App.jsx` (`modalOpen`). `onBook` callback passed to: Nav, Hero (primary CTA), Services (each card), About, CtaFinal.
+- Accessible: focus trap on Tab/Shift+Tab, Esc closes, backdrop click closes, `aria-modal`, `role="dialog"`.
+
+### Analytics — prepared, NOT active
+- `src/hooks/useAnalytics.js` — two internal hooks: `useMetaPixel(pixelId)` and `useGa4(ga4Id)`.
+- Called in App.jsx with `g?.globalMetaPixelId || ''` and `g?.globalGa4Id || ''`.
+- Both hooks return immediately when the ID is an empty string — **currently inert**.
+- **To activate at launch:**
+  1. In WP Admin → Custom Fields → `fg_global`: add two Text fields named `global_meta_pixel_id` and `global_ga4_id`.
+  2. In `queries.js`, uncomment / add `globalMetaPixelId` and `globalGa4Id` inside the `fgGlobal` block.
+  3. Fill in the IDs in WP Admin → Pages → Home → Global Settings.
+
+### Contact form
+- Currently UI-only (shows a sent-confirmation state). No backend wired. Form submission backend is Phase 4 / post-launch.

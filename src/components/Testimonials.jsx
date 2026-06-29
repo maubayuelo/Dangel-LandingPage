@@ -8,14 +8,26 @@ function Avatar({ name }) {
   return <div className="testi__avatar" aria-hidden="true">{initials}</div>
 }
 
-function TestiCard({ item, span }) {
+const TRANSLATED_FROM = {
+  en: { fr: 'Translated from French', es: 'Translated from Spanish' },
+  fr: { en: 'Traduit de l\'anglais', es: 'Traduit de l\'espagnol' },
+  es: { en: 'Traducido del inglés', fr: 'Traducido del francés' },
+}
+
+function TestiCard({ item, span, lang }) {
   const service = [item.tsService, item.tsDate].filter(Boolean).join(' · ')
+  const translatedFrom = item.tsOriginalLang && item.tsOriginalLang !== lang
+    ? TRANSLATED_FROM[lang]?.[item.tsOriginalLang]
+    : null
   return (
     <article className="testi__card" style={{ '--span': span }}>
       <span className="testi__stars" aria-label="5 étoiles">★★★★★</span>
       <blockquote className={`testi__quote${span >= 3 ? ' testi__quote--lg' : ''}`}>
         {item.tsQuote}
       </blockquote>
+      {translatedFrom && (
+        <p className="testi__translated">{translatedFrom}</p>
+      )}
       <div className="testi__divider" />
       <div className="testi__author">
         <Avatar name={item.tsName} />
@@ -28,7 +40,7 @@ function TestiCard({ item, span }) {
   )
 }
 
-export default function Testimonials({ data: d }) {
+export default function Testimonials({ data: d, lang = 'fr' }) {
   if (!d) return null
   const items = d.testimonialsItems || []
 
@@ -46,7 +58,7 @@ export default function Testimonials({ data: d }) {
         {items.length > 0 && (
           <div className="testimonials__grid">
             {items.map((item, i) => (
-              <TestiCard key={i} item={item} span={SPANS[i] ?? 1} />
+              <TestiCard key={i} item={item} span={SPANS[i] ?? 1} lang={lang} />
             ))}
           </div>
         )}

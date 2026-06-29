@@ -6,7 +6,7 @@ function stripOuterP(html = '') {
   return html.replace(/^<p>([\s\S]*?)<\/p>\s*$/, '$1').trim()
 }
 
-export default function Hero({ data: h }) {
+export default function Hero({ data: h, onBook }) {
   if (!h) return null
 
   const photoUrl = h.heroPhoto?.node?.sourceUrl || PHOTO_FALLBACK
@@ -32,8 +32,13 @@ export default function Hero({ data: h }) {
           <p className="hero__lang">{h.heroSubtext2}</p>
 
           <div className="hero__ctas">
-            <button className="btn-primary">→ {h.heroCtaPrimaryLabel}</button>
-            <button className="btn-outline">{h.heroCtaSecondaryLabel} ↓</button>
+            <button className="btn-primary" onClick={onBook}>→ {h.heroCtaPrimaryLabel}</button>
+            <button
+              className="btn-outline"
+              onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              {h.heroCtaSecondaryLabel} ↓
+            </button>
           </div>
 
           <div className="hero__trust">

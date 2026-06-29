@@ -8,15 +8,13 @@ function parseListItems(html = '') {
     .map(m => m[1].replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim())
 }
 
-export default function About({ data: d }) {
+export default function About({ data: d, onBook }) {
   if (!d) return null
 
   const disciplines = parseListItems(d.aboutDisciplinesList || '')
   const langs = d.aboutLanguages || []
   const photoUrl = d.aboutPhoto?.node?.sourceUrl || PHOTO_FALLBACK
   const photoAlt = d.aboutPhoto?.node?.altText || 'Dangel en session'
-
-  const scrollToContact = () => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
 
   return (
     <section className="about" id="about">
@@ -61,7 +59,7 @@ export default function About({ data: d }) {
               </div>
             )}
 
-            <button className="btn-primary about__cta" onClick={scrollToContact}>
+            <button className="btn-primary about__cta" onClick={onBook}>
               → {d.aboutCtaLabel || 'Réserver une séance'}
             </button>
           </div>

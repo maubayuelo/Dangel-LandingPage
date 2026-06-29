@@ -105,6 +105,19 @@
 }
 .nav__cta:hover { opacity: 0.9; }
 
+/* ── Mobile right group (CTA + hamburger) ─────── */
+.nav__mobile-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.nav__cta--mobile {
+  display: flex;
+  font-size: var(--text-12);
+  padding: 0.5rem 0.875rem;
+}
+
 /* ── Hamburger ────────────────────────────────── */
 .nav__hamburger {
   display: flex;
@@ -156,6 +169,6 @@
 
 /* ── Breakpoint ───────────────────────────────── */
 @media (min-width: 768px) {
-  .nav__desktop  { display: flex; }
-  .nav__hamburger { display: none; }
+  .nav__desktop      { display: flex; }
+  .nav__mobile-right { display: none; }
 }

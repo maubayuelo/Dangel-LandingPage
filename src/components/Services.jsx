@@ -33,10 +33,9 @@ function ServiceCard({ s, wide, onBook }) {
   )
 }
 
-export default function Services({ data: d }) {
+export default function Services({ data: d, onBook }) {
   if (!d) return null
   const items = d.servicesItems || []
-  const scrollToContact = () => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
 
   return (
     <section className="services" id="services">
@@ -50,7 +49,7 @@ export default function Services({ data: d }) {
         {items.length > 0 && (
           <div className="services__grid">
             {items.map((s, i) => (
-              <ServiceCard key={i} s={s} wide={i === 0} onBook={scrollToContact} />
+              <ServiceCard key={i} s={s} wide={i === 0} onBook={onBook} />
             ))}
           </div>
         )}

@@ -94,7 +94,7 @@
 /* ── Tablet ─────────────────────────────────── */
 @media (min-width: 768px) and (max-width: 1023px) {
   .hero__container { padding-block: var(--space-24); }
-  .hero__photo img  { height: 380px; }
+  .hero__photo img  { height: auto; aspect-ratio: 1 / 1; object-position: center top; }
 }
 
 /* ── Desktop: side-by-side ─────────────────── */

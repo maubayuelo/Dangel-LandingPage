@@ -52,6 +52,13 @@
 
 .testi__quote--lg { font-size: var(--text-17); }
 
+.testi__translated {
+  font-size: var(--text-11);
+  color: var(--text-dimmer);
+  font-style: italic;
+  margin-bottom: var(--space-4);
+}
+
 .testi__divider {
   width: 100%;
   height: 1px;

@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client'
 
 export const GET_PAGE = gql`
-  query GetPage {
-    page(id: "home", idType: URI) {
+  query GetPage($pageId: ID!) {
+    page(id: $pageId, idType: URI) {
       fgNavigation {
         navLogoText
         navLogoImage { node { sourceUrl altText } }
@@ -14,6 +14,7 @@ export const GET_PAGE = gql`
         globalSitePhone
         globalSiteEmail
         globalSiteAddress
+        # Add globalMetaPixelId + globalGa4Id here once fields exist in WP ACF fg_global
       }
       fgHero {
         heroEyebrow
@@ -62,7 +63,7 @@ export const GET_PAGE = gql`
         testimonialsEyebrow
         testimonialsTitle
         testimonialsSocialProof
-        testimonialsItems { tsName tsQuote tsService tsDate }
+        testimonialsItems { tsName tsQuote tsService tsDate tsOriginalLang }
         testimonialsFbLinkLabel
         testimonialsFbLinkUrl
       }

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import '../styles/nav.css'
 
-export default function Nav({ data: d }) {
+export default function Nav({ data: d, lang, onLangChange, onBook }) {
   const [open, setOpen] = useState(false)
   const links = d?.navLinks || []
   const ctaLabel = d?.navCtaLabel || 'Réserver'
@@ -35,28 +35,40 @@ export default function Nav({ data: d }) {
           </div>
           <div className="nav__divider" />
           <div className="nav__lang">
-            <button className="nav__lang-btn nav__lang-btn--active">FR</button>
-            <span className="nav__lang-dot" aria-hidden="true">·</span>
-            <button className="nav__lang-btn">EN</button>
-            <span className="nav__lang-dot" aria-hidden="true">·</span>
-            <button className="nav__lang-btn">ES</button>
+            {['en', 'fr', 'es'].map((l, i, arr) => (
+              <span key={l} style={{ display: 'inline-flex', alignItems: 'center', gap: 'inherit' }}>
+                <button
+                  className={`nav__lang-btn${lang === l ? ' nav__lang-btn--active' : ''}`}
+                  onClick={() => onLangChange(l)}
+                  aria-current={lang === l ? 'true' : undefined}
+                >
+                  {l.toUpperCase()}
+                </button>
+                {i < arr.length - 1 && <span className="nav__lang-dot" aria-hidden="true">·</span>}
+              </span>
+            ))}
           </div>
-          <button className="nav__cta" onClick={() => scrollTo('#contact')}>
+          <button className="nav__cta" onClick={onBook}>
             {ctaLabel} →
           </button>
         </div>
 
-        {/* Mobile hamburger */}
-        <button
-          className="nav__hamburger"
-          onClick={() => setOpen(!open)}
-          aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
-          aria-expanded={open}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
+        {/* Mobile: CTA + hamburger */}
+        <div className="nav__mobile-right">
+          <button className="nav__cta nav__cta--mobile" onClick={onBook}>
+            {ctaLabel}
+          </button>
+          <button
+            className="nav__hamburger"
+            onClick={() => setOpen(!open)}
+            aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
+            aria-expanded={open}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
       </div>
 
       {/* Mobile panel */}
@@ -69,13 +81,20 @@ export default function Nav({ data: d }) {
           ))}
           <div className="nav__mobile-footer">
             <div className="nav__lang">
-              <button className="nav__lang-btn nav__lang-btn--active">FR</button>
-              <span className="nav__lang-dot" aria-hidden="true">·</span>
-              <button className="nav__lang-btn">EN</button>
-              <span className="nav__lang-dot" aria-hidden="true">·</span>
-              <button className="nav__lang-btn">ES</button>
+              {['en', 'fr', 'es'].map((l, i, arr) => (
+                <span key={l} style={{ display: 'inline-flex', alignItems: 'center', gap: 'inherit' }}>
+                  <button
+                    className={`nav__lang-btn${lang === l ? ' nav__lang-btn--active' : ''}`}
+                    onClick={() => { onLangChange(l); setOpen(false) }}
+                    aria-current={lang === l ? 'true' : undefined}
+                  >
+                    {l.toUpperCase()}
+                  </button>
+                  {i < arr.length - 1 && <span className="nav__lang-dot" aria-hidden="true">·</span>}
+                </span>
+              ))}
             </div>
-            <button className="nav__cta" onClick={() => scrollTo('#contact')}>
+            <button className="nav__cta" onClick={() => { onBook(); setOpen(false) }}>
               {ctaLabel} →
             </button>
           </div>

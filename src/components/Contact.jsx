@@ -1,16 +1,47 @@
 import { useState } from 'react'
+import emailjs from '@emailjs/browser'
 import '../styles/contact.css'
 
+const EJS_SERVICE       = import.meta.env.VITE_EMAILJS_SERVICE_ID
+const EJS_TEMPLATE      = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
+const EJS_NOTIF         = import.meta.env.VITE_EMAILJS_NOTIFICATION_TEMPLATE_ID
+const EJS_KEY           = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+
 export default function Contact({ data: d }) {
-  const [form, setForm] = useState({ name: '', email: '', message: '' })
-  const [sent, setSent] = useState(false)
+  const [form, setForm]       = useState({ name: '', email: '', message: '' })
+  const [sent, setSent]       = useState(false)
+  const [sending, setSending] = useState(false)
+  const [error, setError]     = useState(null)
   if (!d) return null
 
   const schedule = d.contactScheduleItems || []
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    setSent(true)
+    setSending(true)
+    setError(null)
+    const params = {
+      from_name:  form.name,
+      from_email: form.email,
+      message:    form.message,
+      reply_to:   form.email,
+      phone:      d.contactPhone || '',
+      name:       form.name,
+    }
+    try {
+      await Promise.all([
+        // Notification to contact@dangelwellness.ca
+        emailjs.send(EJS_SERVICE, EJS_NOTIF, params, EJS_KEY),
+        // Auto-reply to the visitor
+        emailjs.send(EJS_SERVICE, EJS_TEMPLATE, params, EJS_KEY),
+      ])
+      setSent(true)
+    } catch (err) {
+      console.error('EmailJS error:', err)
+      setError('Une erreur est survenue. Veuillez réessayer.')
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -103,9 +134,10 @@ export default function Contact({ data: d }) {
                       className="contact__input contact__textarea"
                     />
                   </div>
-                  <button type="submit" className="btn-primary">
-                    → {d.contactFormCtaLabel || 'Envoyer'}
+                  <button type="submit" className="btn-primary" disabled={sending}>
+                    {sending ? '…' : `→ ${d.contactFormCtaLabel || 'Envoyer'}`}
                   </button>
+                  {error && <p className="contact__error">{error}</p>}
                 </form>
               </>
             )}

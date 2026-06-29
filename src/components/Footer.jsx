@@ -26,9 +26,16 @@ export default function Footer({ data: d, global: g }) {
             <nav className="footer__nav" aria-label="Liens du pied de page">
               {d.footerNavTitle && <p className="footer__col-title">{d.footerNavTitle}</p>}
               {navItems.map((item, i) => (
-                <a key={i} href={item.fnAnchor} className="footer__nav-link">
+                <button
+                  key={i}
+                  className="footer__nav-link"
+                  onClick={() => {
+                    const id = item.fnAnchor?.replace('#', '')
+                    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+                  }}
+                >
                   {item.fnLabel}
-                </a>
+                </button>
               ))}
             </nav>
           )}
