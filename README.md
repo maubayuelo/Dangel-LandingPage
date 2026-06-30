@@ -43,25 +43,61 @@ Think of it this way:
 
 ## Prerequisites
 
-Before you can run this project you need two things:
+Before you can run this project you need three things:
 
 ### 1. WordPress CMS
-Content is fetched from the live production GraphQL endpoint: `https://cms.dangelwellness.ca/graphql`
+Content is fetched from a WordPress GraphQL endpoint. The URL is configured
+via an environment variable — see the **Environment Variables** section below.
 
-For local development, change the URI in [src/graphql/client.js](src/graphql/client.js) to `http://dangelwellness.local/graphql` and start the **dangelwellness** site in [Local by Flywheel](https://localwp.com/).
+For local development, start the **dangelwellness** site in
+[Local by Flywheel](https://localwp.com/) before running `npm run dev`.
 
 ### 2. Node.js
 Install [Node.js](https://nodejs.org/) v18 or later.
+
+### 3. Environment variables
+Copy `.env.example` to `.env.local` and fill in the values:
+
+```bash
+cp .env.example .env.local
+```
+
+`.env.local` is gitignored — it lives only on your machine and is never
+committed. `.env.example` is committed and serves as a template so every
+developer knows which variables are needed.
+
+---
+
+## Environment Variables
+
+All secrets and machine-specific URLs live in `.env.local` (never committed).
+
+| Variable | What it is |
+|---|---|
+| `VITE_GRAPHQL_URI` | WordPress GraphQL endpoint. Local: `http://dangelwellness.local/graphql` · Prod: `https://cms.dangelwellness.ca/graphql` |
+| `VITE_EMAILJS_SERVICE_ID` | EmailJS service ID (contact form delivery) |
+| `VITE_EMAILJS_TEMPLATE_ID` | EmailJS auto-reply template ID |
+| `VITE_EMAILJS_NOTIFICATION_TEMPLATE_ID` | EmailJS notification template ID |
+| `VITE_EMAILJS_PUBLIC_KEY` | EmailJS public key |
+
+> **Why the `VITE_` prefix?** Vite only exposes variables that start with `VITE_`
+> to browser code. Variables without that prefix stay server-side only (for
+> safety). They're accessed in code as `import.meta.env.VITE_VARIABLE_NAME`.
 
 ---
 
 ## Getting Started
 
 ```bash
-# Install dependencies (only needed once)
+# 1. Install dependencies (only needed once)
 npm install
 
-# Start the development server
+# 2. Copy the environment variable template and fill in your values
+cp .env.example .env.local
+
+# 3. Start Local by Flywheel (dangelwellness site must be running for content to appear)
+
+# 4. Start the development server
 npm run dev
 ```
 
@@ -74,8 +110,10 @@ Open `http://localhost:5173` in your browser.
 ```
 landing-page-dangel/
 ├── index.html                  # HTML shell — SEO meta tags, GA4 script, <div id="root">
-├── vite.config.js              # Vite bundler configuration
+├── vite.config.js              # Vite bundler + Vitest test runner configuration
 ├── package.json                # Dependencies and npm scripts
+├── .env.example                # Template listing all required environment variables (committed)
+├── .env.local                  # Your actual secrets — NEVER committed to git
 ├── public/
 │   ├── robots.txt              # Allows AI crawlers (GPTBot, ClaudeBot, PerplexityBot)
 │   ├── sitemap.xml             # All three language URLs for search engines
@@ -84,14 +122,15 @@ landing-page-dangel/
     ├── main.jsx                # Entry — ReactDOM.createRoot, ApolloProvider wraps App
     ├── App.jsx                 # Root — ONE useQuery, distributes data as props to sections
     ├── graphql/
-    │   ├── client.js           # Apollo Client instance (HTTP link + InMemoryCache)
+    │   ├── client.js           # Apollo Client — reads endpoint from VITE_GRAPHQL_URI env var
     │   └── queries.js          # GET_PAGE master query (all content in one request)
     ├── hooks/
     │   ├── useLanguage.js      # Custom hook — URL path > localStorage > 'en' priority
     │   └── useAnalytics.js     # Custom hook — injects Meta Pixel + GA4 scripts on demand
     ├── components/             # One file per page section
+    │   ├── ErrorBoundary.jsx   # Catches crashes inside a section; shows friendly fallback
     │   ├── Nav.jsx             # Sticky nav, hamburger menu, language switcher
-    │   ├── Hero.jsx            # Above-the-fold, stripOuterP() for WP headline HTML
+    │   ├── Hero.jsx            # Above-the-fold, DOMPurify sanitizes WP headline HTML
     │   ├── Benefits.jsx        # 5-card bento grid
     │   ├── Services.jsx        # 3-column service cards with technique tags
     │   ├── Process.jsx         # 3-step how-it-works cards
@@ -104,6 +143,7 @@ landing-page-dangel/
     │   └── BookingModal.jsx    # iframe modal, focus trap, Esc/backdrop close
     └── styles/
         ├── tokens.css          # ALL design tokens (colors, fonts, spacing, radii)
+        ├── loading-skeleton.css# Animated grey-bar skeleton shown while GraphQL fetches
         └── [section].css       # One CSS file per component, mobile-first
 ```
 
@@ -233,11 +273,14 @@ Upload the entire `/dist` folder to `dangelwellness.ca/public_html/`. The `.htac
 | Symptom | Cause | Fix |
 |---|---|---|
 | Blank page / "GraphQL error" | Queried a field that doesn't exist in WP | Remove the field from `queries.js` |
+| Section shows "Cette section est temporairement indisponible" | A section component crashed (bad data shape) | Open browser console — the ErrorBoundary logs the exact error and component stack |
+| Skeleton spins forever, no content | `VITE_GRAPHQL_URI` points to a server that isn't running | Start Local by Flywheel (dev) or check network tab for the failing request |
 | Section is empty | ACF fields not filled in WP Admin | Fill content in Pages → Home |
 | Images show placeholder | `heroPhoto` / `aboutPhoto` not set in WP | Upload image in WP Admin → Media |
 | `useQuery` not exported | Apollo Client v4 breaks this export | Project pins `@apollo/client@^3.x` |
 | Stale bundle after package changes | Vite caches aggressively | `rm -rf node_modules/.vite` then restart |
 | `fgFAQ` returns null | WPGraphQL lowercases after acronym | Use `fgFaq` (lowercase q) |
+| `VITE_GRAPHQL_URI` is undefined in code | Variable not prefixed with `VITE_` | All browser-accessible env vars must start with `VITE_` |
 
 ---
 
@@ -255,7 +298,10 @@ Upload the entire `/dist` folder to `dangelwellness.ca/public_html/`. The `.htac
 | Nullish coalescing `??` / OR `\|\|` | Everywhere: `d.faqItems \|\| []` |
 | `Array.map()` | Every list/repeater: `items.map((item, i) => ...)` |
 | Conditional rendering | `{condition && <JSX>}` and `{cond ? a : b}` |
-| `dangerouslySetInnerHTML` | `Hero.jsx` (headline HTML from WP) |
+| `dangerouslySetInnerHTML` + DOMPurify | `Hero.jsx` — injects WP HTML, sanitized before injection |
+| Class component + error lifecycle | `ErrorBoundary.jsx` — `getDerivedStateFromError`, `componentDidCatch` |
+| CSS `@keyframes` animation | `loading-skeleton.css` — pulse animation for skeleton bars |
+| Vite environment variables | `src/graphql/client.js` — `import.meta.env.VITE_GRAPHQL_URI` |
 | Event listener cleanup | `BookingModal.jsx`, `useLanguage.js` |
 | Focus trap | `BookingModal.jsx` |
 | `history.pushState` | `useLanguage.js` (URL-based language switching) |

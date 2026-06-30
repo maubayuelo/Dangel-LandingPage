@@ -52,9 +52,9 @@ export const GET_PAGE = gql`
         globalSiteAddress
         globalSeoTitle
         globalSeoDescription
-        # Text field (not Image type) — client pastes the full OG image URL directly.
-        # Add "global_seo_og_image_url" as a Text field in WP ACF fg_global.
-        globalSeoOgImageUrl
+        # globalSeoOgImageUrl — add a Text field named "global_seo_og_image_url"
+        # in WP ACF fg_global, then uncomment the line below to activate.
+        # globalSeoOgImageUrl
         # Analytics IDs — hooks return immediately when these are empty strings.
         # Fill them in WP Admin → Pages → Home → Global Settings to activate.
         globalMetaPixelId
@@ -203,20 +203,6 @@ export const GET_PAGE = gql`
         footerSocialTitle
         footerSocialItems { fsName fsUrl }
         footerCopyright
-      }
-    }
-  }
-`
-
-// GET_HERO — a smaller isolated query used during development to test just
-// the Hero section without loading the full page query. Not used in production.
-export const GET_HERO = gql`
-  query GetHero {
-    page(id: "home", idType: URI) {
-      fgHero {
-        heroEyebrow heroHeadline heroSubtext heroSubtext2
-        heroTrustRating heroTrustText heroCtaPrimaryLabel heroCtaSecondaryLabel
-        heroPhoto { node { sourceUrl altText } }
       }
     }
   }

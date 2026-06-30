@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// STEP 3 — graphql/client.js — APOLLO CLIENT CONFIGURATION
+// graphql/client.js — APOLLO CLIENT CONFIGURATION
 //
 // Apollo Client is the library that handles all communication with the
 // WordPress GraphQL API. Think of it as a smart HTTP client that:
@@ -11,16 +11,32 @@
 // REST API: you call /api/hero, /api/services, /api/faq → 3 separate requests
 // GraphQL: you describe ALL the data you need in one query → 1 request, exactly
 // the fields you asked for, nothing more. The server is at /graphql.
+//
+// ENDPOINT CONFIGURATION — environment variable:
+//   The GraphQL URL is read from VITE_GRAPHQL_URI in your .env.local file.
+//   This keeps the URL out of the committed source code (different per machine).
+//
+//   Local dev  → set VITE_GRAPHQL_URI=http://dangelwellness.local/graphql
+//   Production → set VITE_GRAPHQL_URI=https://cms.dangelwellness.ca/graphql
+//              (or leave the variable unset — the fallback below is the prod URL)
+//
+//   How Vite env vars work:
+//     - Variables MUST be prefixed VITE_ to be accessible in browser code.
+//     - They are accessed via import.meta.env.VITE_VARIABLE_NAME at build time.
+//     - Vite replaces import.meta.env.VITE_* with the actual string value when
+//       it bundles the code — they are NOT available at runtime like Node's
+//       process.env. The .env.local file is never committed to git.
+//     - See .env.example for a template of all required variables.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client'
 
 // createHttpLink defines WHERE to send GraphQL requests.
-// This points to the WordPress site's GraphQL endpoint (provided by WPGraphQL plugin).
-// In development this was dangelwellness.local/graphql (Local by Flywheel).
-// In production it points to the live CMS subdomain.
+// import.meta.env.VITE_GRAPHQL_URI reads from .env.local (never committed to git).
+// The || fallback kicks in when the variable is missing (e.g. on a first clone
+// before anyone has created a .env.local file).
 const httpLink = createHttpLink({
-  uri: 'https://cms.dangelwellness.ca/graphql',
+  uri: import.meta.env.VITE_GRAPHQL_URI || 'https://cms.dangelwellness.ca/graphql',
 })
 
 // ApolloClient is instantiated once and shared across the entire app via

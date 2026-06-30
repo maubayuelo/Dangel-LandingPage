@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// STEP 10 — components/Hero.jsx — HERO SECTION (above the fold)
+// components/Hero.jsx — HERO SECTION (above the fold)
 //
 // COMPONENT ANATOMY:
 // Every section component in this project follows the same pattern:
@@ -10,7 +10,27 @@
 //
 // This component also has one helper function (stripOuterP) that solves
 // a specific WordPress behaviour — documented below.
+//
+// SECURITY NOTE — HTML sanitization with DOMPurify:
+//   heroHeadline comes from WordPress with HTML inside it (e.g. <em> tags
+//   for italic text). React's dangerouslySetInnerHTML lets us inject that
+//   raw HTML into the page — but it bypasses React's normal XSS protection.
+//
+//   XSS (Cross-Site Scripting) is when an attacker injects a <script> tag or
+//   an event handler (onclick, onerror) into your page to run malicious code.
+//
+//   DOMPurify.sanitize() reads the HTML string and strips anything dangerous
+//   before we inject it. For example:
+//     Input:  '<em>Bien-être</em><script>stealCookies()</script>'
+//     Output: '<em>Bien-être</em>'   ← script tag removed
+//
+//   Our WordPress is trusted, but sanitizing is still a good habit —
+//   it protects against accidents (a plugin injecting bad markup) and
+//   makes a security audit much easier to pass.
 // ─────────────────────────────────────────────────────────────────────────────
+
+// DOMPurify cleans HTML strings. Install: npm install dompurify
+import DOMPurify from 'dompurify'
 
 // Importing the CSS file for this component. Vite (the build tool) processes
 // this import and injects the CSS into the page automatically.
@@ -92,14 +112,24 @@ export default function Hero({ data: h, onBook }) {
 
           {/*
             dangerouslySetInnerHTML is React's way to inject raw HTML strings.
-            The name "dangerously" is a warning: injecting HTML from untrusted
-            sources enables XSS (cross-site scripting) attacks. It is safe here
-            because the content comes from our own trusted WordPress backend.
-            __html is required by React as a safety reminder — { __html: string }
+            The name "dangerously" is a deliberate warning from the React team:
+            injecting HTML from untrusted sources enables XSS attacks.
+
+            We apply TWO transformations before injecting:
+              1. stripOuterP()          — removes the <p>…</p> WordPress wraps
+                                          around text fields (wpautop behaviour)
+              2. DOMPurify.sanitize()   — strips any dangerous tags/attributes
+
+            The chained call reads inside-out:
+              stripOuterP(h.heroHeadline)   → removes the outer <p>
+              DOMPurify.sanitize(...)       → cleans the result
+
+            __html is a required key React uses as a safety reminder that you
+            know what you're doing — { __html: string }.
           */}
           <h1
             className="hero__headline"
-            dangerouslySetInnerHTML={{ __html: stripOuterP(h.heroHeadline) }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(stripOuterP(h.heroHeadline)) }}
           />
 
           <p className="hero__subtext">{h.heroSubtext}</p>
