@@ -52,6 +52,9 @@ export const GET_PAGE = gql`
         globalSiteAddress
         globalSeoTitle
         globalSeoDescription
+        # Text field (not Image type) — client pastes the full OG image URL directly.
+        # Add "global_seo_og_image_url" as a Text field in WP ACF fg_global.
+        globalSeoOgImageUrl
         # Analytics IDs — hooks return immediately when these are empty strings.
         # Fill them in WP Admin → Pages → Home → Global Settings to activate.
         globalMetaPixelId

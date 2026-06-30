@@ -105,6 +105,12 @@ export default function App() {
       document.querySelector('meta[property="og:description"]')?.setAttribute('content', g.globalSeoDescription)
       document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', g.globalSeoDescription)
     }
+    // OG image — stored as a plain URL text field in WP to avoid WPGraphQL
+    // Image type resolution issues. Client pastes the full URL in WP Admin.
+    if (g.globalSeoOgImageUrl) {
+      document.querySelector('meta[property="og:image"]')?.setAttribute('content', g.globalSeoOgImageUrl)
+      document.querySelector('meta[name="twitter:image"]')?.setAttribute('content', g.globalSeoOgImageUrl)
+    }
   }, [g]) // re-run this effect whenever g changes
 
   // ── Analytics ────────────────────────────────────────────────────────────────

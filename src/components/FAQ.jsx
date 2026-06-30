@@ -68,15 +68,10 @@ export default function FAQ({ data: d }) {
               use a unique ID from the data instead.
             */}
             {items.map((item, i) => (
+              // className: template literal + ternary adds --open modifier when this item is active.
+              // open === i ? ' faq__item--open' : ''  →  condition ? value_if_true : value_if_false
               <div
                 key={i}
-                {/*
-                  Dynamic class name: template literal combines static class with
-                  conditional class. When open === i (this item is open), adds
-                  the modifier class ' faq__item--open' (BEM naming convention).
-                  open === i ? ' faq__item--open' : '' is a ternary operator:
-                    condition ? value_if_true : value_if_false
-                */}
                 className={`faq__item${open === i ? ' faq__item--open' : ''}`}
               >
                 {/*

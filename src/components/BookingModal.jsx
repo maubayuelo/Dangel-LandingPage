@@ -141,11 +141,8 @@ export default function BookingModal({ open, onClose, bookingUrl, lang = 'en' })
       aria-label="Réservation en ligne"
       ref={overlayRef}
       onKeyDown={handleKeyDown}
-      {/*
-        Backdrop click to close: we only close when the click target IS the overlay
-        itself (not a child inside it). e.target === e.currentTarget checks this.
-        If the user clicks inside the panel, e.target would be a child element.
-      */}
+      // Backdrop click to close: only triggers when clicking the overlay itself,
+      // not a child inside the panel. e.target === e.currentTarget checks this.
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
       <div className="bmodal__panel">
