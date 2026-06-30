@@ -1,0 +1,50 @@
+{
+  "compilerOptions": {
+    /* ── Language target ───────────────────────────────────────────────────── */
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+
+    /* ── Module system ─────────────────────────────────────────────────────── */
+    /* bundler: tells TS that Vite handles module resolution — do not emit files */
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+
+    /* ── JSX ────────────────────────────────────────────────────────────────── */
+    /* react-jsx: uses the new JSX transform (React 17+) — no need to import React */
+    "jsx": "react-jsx",
+
+    /* ── Strictness ─────────────────────────────────────────────────────────── */
+    /* Start with strict mode on — it catches the most bugs.
+       Specifically: noImplicitAny catches untyped variables,
+       strictNullChecks catches the null/undefined access bugs we document
+       in README.md's Common Issues table. */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* ── Interop ────────────────────────────────────────────────────────────── */
+    /* allowJs: existing .jsx files work alongside new .ts/.tsx files.
+       This is the key setting that makes the incremental migration safe —
+       you don't have to convert everything at once. */
+    "allowJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* ── Output ─────────────────────────────────────────────────────────────── */
+    /* noEmit: Vite does the actual bundling, not tsc.
+       tsc is used only for type-checking (and will be run via `tsc --noEmit`). */
+    "noEmit": true,
+    "skipLibCheck": true,
+
+    /* types: vite/client provides declarations for:
+         - CSS/image imports (so `import './foo.css'` doesn't error)
+         - import.meta.env.VITE_* variables
+         - import.meta.hot (HMR API)
+       Without this, TypeScript errors on every CSS import in .tsx files. */
+    "types": ["vite/client"]
+  },
+  "include": ["src"]
+}

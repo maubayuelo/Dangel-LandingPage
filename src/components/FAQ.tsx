@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// STEP 12 — components/FAQ.jsx — FREQUENTLY ASKED QUESTIONS (accordion)
+// components/FAQ.tsx — FREQUENTLY ASKED QUESTIONS (accordion)
 //
 // KEY CONCEPTS IN THIS FILE:
 //   - useState for UI state (which item is open)
@@ -7,10 +7,36 @@
 //   - Conditional CSS classes using template literals
 //   - Inline SVG icon (no icon library — keeps bundle small)
 //   - aria-expanded for accessibility (screen reader announces open/closed state)
+//
+// TYPESCRIPT PATTERN (reference example for all other section components):
+//   1. Import the specific field group type from graphql/types.ts
+//   2. Define a Props interface — data is optional (nullable) matching PageData
+//   3. Type useState with the correct value type — useState<number | null>
+//   4. Keep the `if (!d) return null` guard — TypeScript still requires it
+//      because `data` is typed as FgFaq | null | undefined
+//
+//   Why FgFaq and not FgFAQ?
+//   WPGraphQL lowercases the letter after an acronym: fg_faq → fgFaq (not fgFAQ).
+//   The type name in types.ts matches exactly. TypeScript will catch any typo.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState } from 'react'
+import type { FgFaq } from '../graphql/types'
 import '../styles/faq.css'
+
+// ── Props interface ───────────────────────────────────────────────────────────
+// Props interfaces are the TypeScript equivalent of PropTypes in older React.
+// They describe the shape of what the parent component (App.tsx) must pass in.
+//
+// `data` is optional/nullable — App.tsx passes p?.fgFaq which can be
+// undefined if the page or field group isn't loaded yet.
+// Matching it as FgFaq | null | undefined covers all three cases:
+//   undefined → query still loading (shouldn't happen — App guards with loading check)
+//   null      → WordPress returned null for this field group (group not attached)
+//   FgFaq     → the happy path with real data
+interface FAQProps {
+  data?: FgFaq | null
+}
 
 // ── Inline SVG icon ───────────────────────────────────────────────────────────
 // Instead of importing an icon library (lucide-react, etc.), we define the SVG
@@ -29,21 +55,29 @@ const ChevronIcon = () => (
   </svg>
 )
 
-export default function FAQ({ data: d }) {
+// ── Component ─────────────────────────────────────────────────────────────────
+// The `{ data: d }` destructuring renames the `data` prop to `d` inside the function.
+// The `: FAQProps` annotation tells TypeScript to enforce the prop contract.
+export default function FAQ({ data: d }: FAQProps) {
 
   // ── Accordion state ───────────────────────────────────────────────────────────
   // `open` stores the INDEX of the currently open FAQ item, or null if all closed.
   // Only one item can be open at a time (classic accordion behavior).
-  // Using null (not -1 or '') because null is the clearest "nothing is open" value.
-  const [open, setOpen] = useState(null)
+  //
+  // useState<number | null>(null) — the explicit generic type tells TypeScript:
+  //   - The state can only be a number (a valid index) or null (nothing open)
+  //   - Without the generic, TypeScript would infer `null` as the only allowed
+  //     value and reject `setOpen(i)` because `i` is a `number`, not `null`.
+  const [open, setOpen] = useState<number | null>(null)
 
-  // Guard clause
+  // Guard clause — still required even in TypeScript because `d` is typed as
+  // FgFaq | null | undefined. TypeScript narrows the type to FgFaq after this check.
   if (!d) return null
 
-  // Default to empty array if the repeater field has no items yet.
-  // Without || [], this would crash with "Cannot read properties of undefined"
-  // when trying to call .map() on null/undefined.
-  const items = d.faqItems || []
+  // Default to empty array if faqItems is null/undefined.
+  // `d.faqItems` is typed as `FaqItem[] | null | undefined`, so `|| []` gives
+  // us a guaranteed `FaqItem[]` (never null/undefined) for the .map() below.
+  const items = d.faqItems ?? []
 
   return (
     <section className="faq" id="faq">
@@ -59,17 +93,18 @@ export default function FAQ({ data: d }) {
           <div className="faq__list">
             {/*
               Array.map() transforms each item in the array into JSX.
-              It returns a new array of JSX elements.
-              Parameters: (item, i) → item is the current object, i is its index (0, 1, 2...)
+              TypeScript infers `item` as `FaqItem` from the array type —
+              so item.fqQuestion and item.fqAnswer are type-safe.
+              If you typed item.fqText (which doesn't exist), you'd get:
+              "Property 'fqText' does not exist on type 'FaqItem'"
 
-              key={i} — React needs a unique key on each list item so it can efficiently
-              update only the items that change. Using the index as a key is acceptable
-              here because FAQ items don't get reordered. For lists that do reorder,
-              use a unique ID from the data instead.
+              key={i} — React needs a unique key on each list item so it can
+              efficiently update only the items that change. Using the index is
+              acceptable here because FAQ items don't get reordered.
             */}
             {items.map((item, i) => (
-              // className: template literal + ternary adds --open modifier when this item is active.
-              // open === i ? ' faq__item--open' : ''  →  condition ? value_if_true : value_if_false
+              // className: template literal + ternary adds --open modifier when active.
+              // open === i ? ' faq__item--open' : ''  →  condition ? true_value : false_value
               <div
                 key={i}
                 className={`faq__item${open === i ? ' faq__item--open' : ''}`}
@@ -77,8 +112,9 @@ export default function FAQ({ data: d }) {
                 {/*
                   The toggle button. aria-expanded tells screen readers whether
                   the controlled content is visible — required for accessibility.
-                  Value must be a boolean, not a string, so we use {open === i}
-                  which evaluates to true/false.
+                  Value must be a boolean, so we use {open === i} which evaluates
+                  to true/false. TypeScript enforces this — passing a string here
+                  would be a type error.
                 */}
                 <button
                   className="faq__question"
@@ -86,9 +122,9 @@ export default function FAQ({ data: d }) {
                   aria-expanded={open === i}
                 >
                   {/*
-                    onClick logic: setOpen(open === i ? null : i)
-                    - If this item is already open (open === i): close it by setting null
-                    - If this item is closed: open it by setting its index i
+                    onClick: setOpen(open === i ? null : i)
+                    - Already open (open === i) → close it: setOpen(null)
+                    - Closed → open it: setOpen(i)   [i is number — TS allows it]
                     This is a toggle with mutual exclusion (only one open at a time).
                   */}
                   <span>{item.fqQuestion}</span>
@@ -97,9 +133,8 @@ export default function FAQ({ data: d }) {
 
                 {/*
                   Conditional rendering: show the answer only when this item is open.
-                  {open === i && <div>...</div>} — when open !== i, renders nothing.
+                  {open === i && <div>...</div>} — renders nothing when open !== i.
                   React removes the element from the DOM when the condition is false.
-                  (An alternative would be CSS display:none, but this is cleaner.)
                 */}
                 {open === i && (
                   <div className="faq__answer">

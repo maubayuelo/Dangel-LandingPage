@@ -30,6 +30,7 @@ import { useState, useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 
 import { GET_PAGE } from './graphql/queries'
+import type { PageData } from './graphql/types'
 import { useLanguage } from './hooks/useLanguage'
 // Loading skeleton styles — the animated grey bars shown while GraphQL fetches
 import './styles/loading-skeleton.css'
@@ -73,7 +74,10 @@ export default function App() {
   // WPML creates a separate WordPress page for each language translation.
   // We map the current language code to its WordPress URI so GraphQL knows
   // which translated page to return.
-  const LANG_PAGE_URIS = { en: '/home/', fr: '/fr/accueil/', es: '/es/inicio/' }
+  // Record<string, string> allows indexing by `lang` (a string).
+  // Without this type annotation, TypeScript infers the literal type
+  // { en: string; fr: string; es: string } which rejects string-key access.
+  const LANG_PAGE_URIS: Record<string, string> = { en: '/home/', fr: '/fr/accueil/', es: '/es/inicio/' }
 
   // ── GraphQL data fetch ──────────────────────────────────────────────────────
   // useQuery sends the GET_PAGE query to WordPress GraphQL and returns:
@@ -83,7 +87,11 @@ export default function App() {
   //
   // variables: the $pageId argument in the query is filled in here.
   // When lang changes, Apollo re-runs the query with the new pageId automatically.
-  const { data, loading, error } = useQuery(GET_PAGE, {
+  // useQuery<{ page: PageData }> tells TypeScript the exact shape of data.
+  // From this point on, `data.page.fgFAQ` is a compile-time error (correct: fgFaq).
+  // Any field name typo that would silently return undefined at runtime is now
+  // caught here, before the code ever runs.
+  const { data, loading, error } = useQuery<{ page: PageData }>(GET_PAGE, {
     variables: { pageId: LANG_PAGE_URIS[lang] || '/home/' },
   })
 
@@ -120,12 +128,14 @@ export default function App() {
       document.querySelector('meta[property="og:description"]')?.setAttribute('content', g.globalSeoDescription)
       document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', g.globalSeoDescription)
     }
-    // OG image — stored as a plain URL text field in WP to avoid WPGraphQL
-    // Image type resolution issues. Client pastes the full URL in WP Admin.
-    if (g.globalSeoOgImageUrl) {
-      document.querySelector('meta[property="og:image"]')?.setAttribute('content', g.globalSeoOgImageUrl)
-      document.querySelector('meta[name="twitter:image"]')?.setAttribute('content', g.globalSeoOgImageUrl)
-    }
+    // OG image — not yet active. To enable:
+    //   1. Add Text field "global_seo_og_image_url" in WP Admin → ACF → fg_global
+    //   2. Uncomment globalSeoOgImageUrl in queries.js AND in src/graphql/types.ts
+    //   3. Uncomment the block below
+    // if (g.globalSeoOgImageUrl) {
+    //   document.querySelector('meta[property="og:image"]')?.setAttribute('content', g.globalSeoOgImageUrl)
+    //   document.querySelector('meta[name="twitter:image"]')?.setAttribute('content', g.globalSeoOgImageUrl)
+    // }
   }, [g]) // re-run this effect whenever g changes
 
   // ── Analytics ────────────────────────────────────────────────────────────────
