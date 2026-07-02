@@ -128,6 +128,8 @@ export const GET_PAGE = gql`
         aboutPhoto { node { sourceUrl altText } }
         aboutPhotoCaption
         aboutLanguages { langFlag langLabel }
+        aboutCertifications { certTitle certMeta certBadge certIcon }
+        aboutFormations { formationLabel }
       }
 
       # ── Testimonials ────────────────────────────────────────────────────────

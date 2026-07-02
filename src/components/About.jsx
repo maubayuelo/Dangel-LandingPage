@@ -38,11 +38,23 @@ const IconGraduate = () => (
 
 const IconFormationCheck = () => (
   <svg width="10" height="10" viewBox="0 0 10 10" fill="none"
-    stroke="currentColor" strokeWidth="1.75" strokeLinecap="square" strokeLinejoin="miter"
+    stroke="var(--teal)" strokeWidth="1.75" strokeLinecap="square" strokeLinejoin="miter"
     aria-hidden="true">
     <polyline points="1.5 5.5 3.5 7.5 8.5 2.5"/>
   </svg>
 )
+
+/* Maps the certIcon value from WPGraphQL to the correct SVG component.
+   ACF Select fields return an array even for single selections, e.g. ["badge"].
+   We normalise: unwrap the array if needed, then lowercase + trim. */
+function CertIcon({ type }) {
+  const val = (Array.isArray(type) ? type[0] : type || '').trim().toLowerCase()
+  switch (val) {
+    case 'certificate': return <IconCertificate />
+    case 'graduate':    return <IconGraduate />
+    default:            return <IconBadge />
+  }
+}
 
 export default function About({ data: d, onBook }) {
   if (!d) return null
@@ -84,57 +96,50 @@ export default function About({ data: d, onBook }) {
               </div>
             )}
 
-            {/* ── Certifications & Training — hardcoded; ACF fields connected in next pass ── */}
-            <div className="certifications-block">
-              <hr className="section-divider" />
+            {/* ── Certifications & Training — driven by ACF repeaters aboutCertifications + aboutFormations ── */}
+            {(d.aboutCertifications?.length > 0 || d.aboutFormations?.length > 0) && (
+              <div className="certifications-block">
+                <hr className="section-divider" />
 
-              <p className="cert-eyebrow">Certifications &amp; Training</p>
-              <div className="cert-grid">
+                {d.aboutCertifications?.length > 0 && (
+                  <>
+                    <p className="cert-eyebrow">Certifications &amp; Training</p>
+                    <div className="cert-grid">
+                      {(d.aboutCertifications || []).map((cert, i) => (
+                        <div key={i} className="cert-card">
+                          <div className="cert-icon">
+                            <CertIcon type={cert.certIcon} />
+                          </div>
+                          <div className="cert-content">
+                            <p className="cert-title">{cert.certTitle}</p>
+                            <p className="cert-meta">{cert.certMeta}</p>
+                            {cert.certBadge && (
+                              <span className="cert-badge">{cert.certBadge}</span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
 
-                <div className="cert-card">
-                  <div className="cert-icon"><IconBadge /></div>
-                  <div className="cert-content">
-                    <p className="cert-title">Massothérapeute Senior M-2360</p>
-                    <p className="cert-meta">RMQ — Regroupement des Massothérapeutes du Québec</p>
-                    <span className="cert-badge">Active 2026</span>
-                  </div>
-                </div>
+                {d.aboutFormations?.length > 0 && (
+                  <>
+                    <p className="cert-eyebrow" style={{ marginTop: 'var(--space-4)' }}>Formations complémentaires</p>
+                    <div className="formations-pills">
+                      {(d.aboutFormations || []).map((f, i) => (
+                        <span key={i} className="formation-pill">
+                          <IconFormationCheck />
+                          {f.formationLabel}
+                        </span>
+                      ))}
+                    </div>
+                  </>
+                )}
 
-                <div className="cert-card">
-                  <div className="cert-icon"><IconCertificate /></div>
-                  <div className="cert-content">
-                    <p className="cert-title">Technicien en massage shiatsu — 480h</p>
-                    <p className="cert-meta">Institut Kiné-Concept, Montréal · 2005</p>
-                  </div>
-                </div>
-
-                <div className="cert-card">
-                  <div className="cert-icon"><IconGraduate /></div>
-                  <div className="cert-content">
-                    <p className="cert-title">Méthode Lavín — Terapia Holística — 200h+</p>
-                    <p className="cert-meta">Holoacademia, Universidad Holística · 2022–2023</p>
-                  </div>
-                </div>
-
+                <hr className="section-divider" />
               </div>
-
-              <p className="cert-eyebrow" style={{ marginTop: 'var(--space-4)' }}>Formations complémentaires</p>
-              <div className="formations-pills">
-                {[
-                  'Shiatsu Masunaga 300h · 2006',
-                  'Biomagnétisme',
-                  'Psychobionique',
-                  'Toucher & conscience · Niveau 1',
-                ].map(label => (
-                  <span key={label} className="formation-pill">
-                    <IconFormationCheck />
-                    {label}
-                  </span>
-                ))}
-              </div>
-
-              <hr className="section-divider" />
-            </div>
+            )}
             {/* ── End Certifications & Training ── */}
 
             {langs.length > 0 && (
