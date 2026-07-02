@@ -115,6 +115,7 @@ landing-page-dangel/
 ├── .env.example                # Template listing all required environment variables (committed)
 ├── .env.local                  # Your actual secrets — NEVER committed to git
 ├── public/
+│   ├── favicon/                # All favicon assets (ico, png, apple-touch, webmanifest)
 │   ├── robots.txt              # Allows AI crawlers (GPTBot, ClaudeBot, PerplexityBot)
 │   ├── sitemap.xml             # All three language URLs for search engines
 │   └── llms.txt                # AI-readable site description (for ChatGPT, Perplexity, etc.)
@@ -134,7 +135,7 @@ landing-page-dangel/
     │   ├── Benefits.jsx        # 5-card bento grid
     │   ├── Services.jsx        # 3-column service cards with technique tags
     │   ├── Process.jsx         # 3-step how-it-works cards
-    │   ├── About.jsx           # 2-col photo + bio, discipline chips
+    │   ├── About.jsx           # 2-col photo + bio, discipline chips, certifications & formations from ACF
     │   ├── Testimonials.jsx    # 6-card grid, "Translated from" language labels
     │   ├── FAQ.jsx             # Accordion — useState controls which item is open
     │   ├── Contact.jsx         # Info column + EmailJS form
@@ -185,7 +186,7 @@ App.jsx
 | `fgBenefits` | `fg_benefits` | `benefitsItems` repeater: `{ benNumber, benTitle, benDescription }` |
 | `fgServices` | `fg_services` | `servicesItems` repeater, `svTechniqueTags` split by comma/newline |
 | `fgProcess` | `fg_process` | `processSteps` repeater: `{ psNumber, psTitle, psDescription }` |
-| `fgAbout` | `fg_about` | `aboutDisciplinesList` is HTML `<ul><li>` — parsed by `parseListItems()` |
+| `fgAbout` | `fg_about` | `aboutDisciplinesList` HTML parsed by `parseListItems()`. `aboutCertifications` repeater: `{ certTitle, certMeta, certBadge, certIcon }`. `aboutFormations` repeater: `{ formationLabel }`. **Note:** `certIcon` is an ACF Select — WPGraphQL returns it as an array `["badge"]`, not a string. |
 | `fgTestimonials` | `fg_testimonials` | `tsOriginalLang` drives "Translated from" labels |
 | `fgFaq` | `fg_faq` | Note: `fgFaq` not `fgFAQ` — WPGraphQL lowercases after acronyms |
 | `fgContact` | `fg_contact` | `contactScheduleItems` repeater: `{ scDay, scHours }` |
@@ -280,6 +281,8 @@ Upload the entire `/dist` folder to `dangelwellness.ca/public_html/`. The `.htac
 | `useQuery` not exported | Apollo Client v4 breaks this export | Project pins `@apollo/client@^3.x` |
 | Stale bundle after package changes | Vite caches aggressively | `rm -rf node_modules/.vite` then restart |
 | `fgFAQ` returns null | WPGraphQL lowercases after acronym | Use `fgFaq` (lowercase q) |
+| ACF Select field crashes component | WPGraphQL returns Select values as an array `["value"]`, not a plain string | Unwrap with `Array.isArray(val) ? val[0] : val` before calling `.trim()` or comparing |
+| Entire section disappears silently | A field added to `queries.js` doesn't exist in WP ACF — WPGraphQL nulls the parent field group | Remove or comment out the field; confirm it exists via GraphQL IDE before re-enabling |
 | `VITE_GRAPHQL_URI` is undefined in code | Variable not prefixed with `VITE_` | All browser-accessible env vars must start with `VITE_` |
 
 ---

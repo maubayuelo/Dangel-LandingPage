@@ -118,6 +118,10 @@ export const GET_PAGE = gql`
       # aboutDisciplinesList returns HTML <ul><li> — About.jsx uses parseListItems()
       # to extract the text from each <li> and render them as teal chip badges.
       # aboutLanguages is a repeater of flag emoji + label pairs.
+      # aboutCertifications repeater: certTitle, certMeta, certBadge, certIcon.
+      #   GOTCHA: certIcon is an ACF Select — WPGraphQL returns it as an ARRAY
+      #   ["badge"], not a string "badge". CertIcon() in About.jsx unwraps it.
+      # aboutFormations repeater: formationLabel (one pill per entry).
       fgAbout {
         aboutEyebrow
         aboutTitle
