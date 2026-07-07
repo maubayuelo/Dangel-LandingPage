@@ -2,10 +2,17 @@ import '../styles/about.css'
 
 const PHOTO_FALLBACK = 'https://placehold.co/440x587/F7F4EE/9B9790?text=Photo'
 
+/* Decode HTML entities (e.g. &#038;, &amp;, &lt;) via the browser's own parser */
+function decodeEntities(str) {
+  const el = document.createElement('textarea')
+  el.innerHTML = str
+  return el.value
+}
+
 /* Parse <li> items from WP HTML into text strings */
 function parseListItems(html = '') {
   return [...html.matchAll(/<li>([\s\S]*?)<\/li>/g)]
-    .map(m => m[1].replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim())
+    .map(m => decodeEntities(m[1]).trim())
 }
 
 /* ── Inline SVG icons for cert cards — no icon library, zero bundle cost ── */
