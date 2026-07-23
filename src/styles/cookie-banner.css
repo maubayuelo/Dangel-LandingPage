@@ -1,0 +1,120 @@
+/* CookieBanner — thin editorial bar, slides in after the hero has landed */
+
+.cbanner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+
+  min-height: 64px;
+  background: var(--carbon);
+  border-top: var(--border-1) solid rgba(255, 255, 255, 0.08);
+
+  transform: translateY(100%);
+  transition: transform 400ms ease-out;
+}
+
+.cbanner--entered {
+  transform: translateY(0);
+}
+
+.cbanner__inner {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding: var(--space-4) var(--space-6);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cbanner__text {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.cbanner__link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--teal);
+  text-decoration: none;
+  cursor: pointer;
+}
+.cbanner__link:hover,
+.cbanner__link:focus-visible {
+  text-decoration: underline;
+}
+
+.cbanner__actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.cbanner__accept,
+.cbanner__decline {
+  flex: 1 1 0;
+  min-height: 44px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 20px;
+  border-radius: var(--radius-badge);
+  transition: opacity var(--duration-fast) var(--ease-default),
+              background var(--duration-fast) var(--ease-default);
+}
+
+.cbanner__accept {
+  background: var(--teal);
+  color: var(--white);
+  border: none;
+}
+.cbanner__accept:hover {
+  opacity: 0.9;
+}
+
+.cbanner__decline {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  border: var(--border-1) solid rgba(255, 255, 255, 0.2);
+}
+.cbanner__decline:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.cbanner__accept:focus-visible,
+.cbanner__decline:focus-visible,
+.cbanner__link:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+/* ── Desktop: single row, text left, buttons right ────────────────────── */
+@media (min-width: 768px) {
+  .cbanner {
+    height: 56px;
+    min-height: 56px;
+  }
+
+  .cbanner__inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    padding-block: 0;
+  }
+
+  .cbanner__actions {
+    flex-shrink: 0;
+  }
+
+  .cbanner__accept,
+  .cbanner__decline {
+    flex: 0 0 auto;
+    min-height: 36px;
+  }
+}

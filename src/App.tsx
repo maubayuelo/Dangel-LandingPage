@@ -49,6 +49,8 @@ import Contact from './components/Contact'
 import CtaFinal from './components/CtaFinal'
 import Footer from './components/Footer'
 import BookingModal from './components/BookingModal'
+import PolicyModal from './components/PolicyModal'
+import CookieBanner from './components/CookieBanner'
 // ErrorBoundary: catches crashes inside a section and shows a friendly fallback
 // instead of crashing the whole page. See components/ErrorBoundary.jsx.
 import ErrorBoundary from './components/ErrorBoundary'
@@ -69,6 +71,10 @@ export default function App() {
   // When setModalOpen(true) is called, React re-renders App and all children.
   // Naming convention: [value, setValue] — the setter is always prefixed with "set".
   const [modalOpen, setModalOpen] = useState(false)
+
+  // Same pattern as modalOpen above, but for the privacy policy document —
+  // opened from the Contact form's consent checkbox and the CookieBanner link.
+  const [policyOpen, setPolicyOpen] = useState(false)
 
   // ── Language → WordPress page URI mapping ───────────────────────────────────
   // WPML creates a separate WordPress page for each language translation.
@@ -154,6 +160,9 @@ export default function App() {
   const openModal = () => setModalOpen(true)
   const closeModal = () => setModalOpen(false)
 
+  const openPolicy = () => setPolicyOpen(true)
+  const closePolicy = () => setPolicyOpen(false)
+
   // ── Loading / error states ────────────────────────────────────────────────────
   // React renders the return value of this function. By returning early ("early
   // return"), we show a completely different UI while the query is in flight or
@@ -233,6 +242,9 @@ export default function App() {
   // the loading check above, p should always be defined here).
   return (
     <>
+      {/* Fixed bottom bar, only rendered once (no consent choice stored yet). */}
+      <CookieBanner onOpenPolicy={openPolicy} />
+
       {/* Nav receives both data AND callbacks (onLangChange, onBook) as props */}
       <Nav
         data={p?.fgNavigation}
@@ -255,12 +267,12 @@ export default function App() {
         <ErrorBoundary><About data={p?.fgAbout} onBook={openModal} /></ErrorBoundary>
         <ErrorBoundary><Testimonials data={p?.fgTestimonials} lang={lang} /></ErrorBoundary>
         <ErrorBoundary><FAQ data={p?.fgFaq} /></ErrorBoundary>
-        <ErrorBoundary><Contact data={p?.fgContact} /></ErrorBoundary>
+        <ErrorBoundary><Contact data={p?.fgContact} onOpenPolicy={openPolicy} /></ErrorBoundary>
         <ErrorBoundary><CtaFinal data={p?.fgCtaFinal} onBook={openModal} /></ErrorBoundary>
       </main>
 
       {/* Footer gets BOTH fgFooter AND fgGlobal — it uses phone/email from global */}
-      <ErrorBoundary><Footer data={p?.fgFooter} global={g} /></ErrorBoundary>
+      <ErrorBoundary><Footer data={p?.fgFooter} global={g} onOpenPolicy={openPolicy} /></ErrorBoundary>
 
       {/* BookingModal is always in the DOM but returns null when open=false.
           This avoids unmounting/remounting the iframe on every open/close. */}
@@ -270,6 +282,9 @@ export default function App() {
         bookingUrl={g?.globalBookingUrl}
         lang={lang}
       />
+
+      {/* Same always-in-DOM pattern as BookingModal — returns null when closed. */}
+      <PolicyModal isOpen={policyOpen} onClose={closePolicy} />
     </>
   )
 }

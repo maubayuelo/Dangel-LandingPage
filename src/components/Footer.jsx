@@ -1,6 +1,6 @@
 import '../styles/footer.css'
 
-export default function Footer({ data: d, global: g }) {
+export default function Footer({ data: d, global: g, onOpenPolicy }) {
   if (!d) return null
   const navItems = d.footerNavItems || []
   const socialItems = d.footerSocialItems || []
@@ -61,9 +61,20 @@ export default function Footer({ data: d, global: g }) {
         </div>
 
         <div className="footer__bottom">
-          <p className="footer__copy">
-            {d.footerCopyright || `© ${new Date().getFullYear()} Dangel. Tous droits réservés.`}
-          </p>
+          <div className="footer-bottom-row">
+            <p className="footer__copy">
+              {d.footerCopyright || `© ${new Date().getFullYear()} Dangel. Tous droits réservés.`}
+            </p>
+            <span className="footer-bottom-sep" aria-hidden="true"> · </span>
+            <button
+              type="button"
+              className="footer-policy-btn"
+              onClick={onOpenPolicy}
+              aria-label="Voir la politique de confidentialité"
+            >
+              Politique de confidentialité
+            </button>
+          </div>
         </div>
       </div>
     </footer>

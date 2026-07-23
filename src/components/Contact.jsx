@@ -7,17 +7,23 @@ const EJS_TEMPLATE      = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
 const EJS_NOTIF         = import.meta.env.VITE_EMAILJS_NOTIFICATION_TEMPLATE_ID
 const EJS_KEY           = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
 
-export default function Contact({ data: d }) {
-  const [form, setForm]       = useState({ name: '', email: '', message: '' })
-  const [sent, setSent]       = useState(false)
-  const [sending, setSending] = useState(false)
-  const [error, setError]     = useState(null)
+export default function Contact({ data: d, onOpenPolicy }) {
+  const [form, setForm]         = useState({ name: '', email: '', message: '' })
+  const [sent, setSent]         = useState(false)
+  const [sending, setSending]   = useState(false)
+  const [error, setError]       = useState(null)
+  const [consent, setConsent]   = useState(false)
+  const [consentError, setConsentError] = useState(false)
   if (!d) return null
 
   const schedule = d.contactScheduleItems || []
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!consent) {
+      setConsentError(true)
+      return
+    }
     setSending(true)
     setError(null)
     const params = {
@@ -134,6 +140,40 @@ export default function Contact({ data: d }) {
                       className="contact__input contact__textarea"
                     />
                   </div>
+                  <div className="contact__consent">
+                    <label className="contact__consent-row" htmlFor="policy-consent">
+                      <span className="contact__consent-box-wrap">
+                        <input
+                          type="checkbox"
+                          id="policy-consent"
+                          required
+                          checked={consent}
+                          onChange={e => {
+                            setConsent(e.target.checked)
+                            if (e.target.checked) setConsentError(false)
+                          }}
+                          className="contact__consent-input"
+                        />
+                        <span className="contact__consent-box" aria-hidden="true" />
+                      </span>
+                      <span className="contact__consent-label">
+                        J&apos;ai lu et j&apos;accepte la{' '}
+                        <button
+                          type="button"
+                          className="contact__consent-link"
+                          onClick={onOpenPolicy}
+                        >
+                          politique de confidentialité
+                        </button>.
+                      </span>
+                    </label>
+                    {consentError && (
+                      <p className="contact__consent-error" role="alert">
+                        Veuillez accepter la politique de confidentialité pour continuer.
+                      </p>
+                    )}
+                  </div>
+
                   <button type="submit" className="btn-primary" disabled={sending}>
                     {sending ? '…' : `→ ${d.contactFormCtaLabel || 'Envoyer'}`}
                   </button>

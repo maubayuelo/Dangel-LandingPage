@@ -140,6 +140,94 @@
   margin-top: var(--space-2);
 }
 
+/* ── Consent checkbox (Loi 25) ─────────────────── */
+.contact__consent {
+  /* .contact__form already applies a 24px flex gap; pull back to the 12px
+     the design calls for between the fields and this row. */
+  margin-top: calc(var(--space-3) - var(--space-6));
+}
+
+.contact__consent-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 44px;
+  padding-block: var(--space-2);
+  cursor: pointer;
+}
+
+.contact__consent-box-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+}
+
+.contact__consent-input {
+  position: absolute;
+  inset: 0;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.contact__consent-box {
+  position: absolute;
+  inset: 0;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--text-dimmer);
+  background: var(--white);
+  border-radius: 3px;
+  pointer-events: none;
+  transition: background var(--duration-fast), border-color var(--duration-fast);
+}
+
+.contact__consent-input:checked + .contact__consent-box {
+  background-color: var(--teal);
+  border-color: var(--teal);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10' fill='none'%3E%3Cpath d='M1 5L4.5 8.5L11 1' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 10px 8px;
+}
+
+.contact__consent-input:focus-visible + .contact__consent-box {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+.contact__consent-label {
+  /* #6B6860 is a precise brand value not yet in tokens.css */
+  --contact-consent-text: #6B6860;
+  font-size: var(--text-13);
+  color: var(--contact-consent-text);
+  line-height: 1.5;
+}
+
+.contact__consent-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--teal);
+  text-decoration: none;
+  cursor: pointer;
+}
+.contact__consent-link:hover,
+.contact__consent-link:focus-visible {
+  text-decoration: underline;
+}
+
+.contact__consent-error {
+  font-size: var(--text-12);
+  color: #c0392b;
+  margin-top: var(--space-1);
+}
+
 @media (min-width: 1024px) {
   .contact__inner {
     flex-direction: row;

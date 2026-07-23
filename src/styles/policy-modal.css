@@ -1,0 +1,156 @@
+/* PolicyModal — legal content presented as a calm, readable document */
+
+.pmodal__overlay {
+  /* Two precise brand values not yet in tokens.css — scoped locally rather
+     than hardcoded throughout this file. */
+  --pmodal-border:    #E4DFD3;
+  --pmodal-body-text: #6B6860;
+
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background: rgba(28, 28, 26, 0.72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: pmodal-fade var(--duration-fast) var(--ease-default);
+}
+
+@keyframes pmodal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.pmodal__panel {
+  display: flex;
+  flex-direction: column;
+  width: min(640px, 90vw);
+  max-height: 82vh;
+  background: var(--cream-light);
+  border-radius: 8px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  animation: pmodal-scale-in 280ms ease-out;
+}
+
+@keyframes pmodal-scale-in {
+  from { transform: scale(0.96); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* ── Header ────────────────────────────────────── */
+.pmodal__header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-6);
+  border-bottom: var(--border-1) solid var(--pmodal-border);
+}
+
+.pmodal__title {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--carbon);
+}
+
+.pmodal__close {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--carbon);
+  font-size: var(--text-15);
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--duration-fast) var(--ease-default);
+}
+.pmodal__close:hover,
+.pmodal__close:focus-visible {
+  background: var(--cream);
+}
+
+/* ── Scrollable body ───────────────────────────── */
+.pmodal__body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: var(--space-6);
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-dimmer) var(--pmodal-border);
+}
+
+.pmodal__body::-webkit-scrollbar {
+  width: 8px;
+}
+.pmodal__body::-webkit-scrollbar-track {
+  background: var(--pmodal-border);
+}
+.pmodal__body::-webkit-scrollbar-thumb {
+  background: var(--text-dimmer);
+  border-radius: var(--radius-badge);
+}
+
+.pmodal__section h2 {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  font-weight: 600;
+  color: var(--carbon);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-2);
+}
+
+.pmodal__section p {
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  font-weight: 400;
+  color: var(--pmodal-body-text);
+  line-height: var(--leading-relaxed);
+}
+
+.pmodal__section p a {
+  color: var(--teal);
+  text-decoration: none;
+}
+.pmodal__section p a:hover {
+  text-decoration: underline;
+}
+
+.pmodal__divider {
+  border: none;
+  border-top: var(--border-1) solid var(--pmodal-border);
+  margin: var(--space-4) 0;
+}
+
+/* ── Footer ────────────────────────────────────── */
+.pmodal__footer {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  padding: var(--space-4) var(--space-6);
+  border-top: var(--border-1) solid var(--pmodal-border);
+}
+
+.pmodal__close-btn {
+  background: var(--teal);
+  color: var(--white);
+  font-size: var(--text-14);
+  font-weight: 500;
+  padding: 10px 32px;
+  border-radius: var(--radius-badge);
+  border: none;
+  width: auto;
+  transition: opacity var(--duration-fast) var(--ease-default);
+}
+.pmodal__close-btn:hover {
+  opacity: 0.9;
+}
