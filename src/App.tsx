@@ -149,7 +149,7 @@ export default function App() {
   // The hook does nothing when the strings are empty (IDs not yet configured).
   // Fill globalMetaPixelId and globalGa4Id in WP Admin to activate tracking.
   useAnalytics({
-    metaPixelId: g?.globalMetaPixelId || '',
+    metaPixelId: g?.globalMetaPixelId || '1270461003083108',
     ga4Id: g?.globalGa4Id || '',
   })
 

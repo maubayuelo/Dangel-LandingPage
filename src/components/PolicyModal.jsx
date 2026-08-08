@@ -7,7 +7,7 @@ const SECTIONS = [
     title: 'Responsable',
     body: (
       <>
-        Dangel Cerda est responsable de la protection des renseignements personnels
+        Dangel Manik est responsable de la protection des renseignements personnels
         collectés via ce site. Pour toute question :{' '}
         <a href="mailto:contact@dangelwellness.ca">contact@dangelwellness.ca</a>
       </>
