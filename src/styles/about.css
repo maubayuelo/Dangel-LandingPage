@@ -18,9 +18,12 @@
 }
 
 .about__photo-col img {
+  display: block;
   width: 100%;
-  aspect-ratio: 3 / 4;
+  height: auto; /* required for aspect-ratio to win over the width/height HTML attrs (CLS reservation) */
+  aspect-ratio: 1 / 1;
   object-fit: cover;
+  object-position: center;
   border-radius: var(--radius-img);
 }
 
@@ -249,8 +252,9 @@
   }
 
   .about__title { font-size: var(--text-44); }
-}
 
-@media (min-width: 768px) and (max-width: 1023px) {
-  .about__photo-col img { aspect-ratio: 1 / 1; object-position: center top; }
+  .about__photo-col img {
+    height: auto;
+    aspect-ratio: 3 / 4;
+  }
 }

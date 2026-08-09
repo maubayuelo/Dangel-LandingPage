@@ -1,61 +1,23 @@
 import { useEffect, useRef } from 'react'
 import '../styles/policy-modal.css'
+import { usePolicyPage } from '../hooks/usePolicyPage'
+import PolicyContent from './PolicyContent'
+import { clearConsent } from '../lib/consent'
+import { t } from '../lib/i18n'
 
-// Static French copy for the privacy policy — no WordPress round-trip needed.
-const SECTIONS = [
-  {
-    title: 'Responsable',
-    body: (
-      <>
-        Dangel Manik est responsable de la protection des renseignements personnels
-        collectés via ce site. Pour toute question :{' '}
-        <a href="mailto:contact@dangelwellness.ca">contact@dangelwellness.ca</a>
-      </>
-    ),
-  },
-  {
-    title: 'Renseignements collectés',
-    body: "Nous collectons les informations suivantes via le formulaire de contact : nom, adresse courriel et contenu de votre message. Nous collectons également des données de navigation anonymes via Google Analytics.",
-  },
-  {
-    title: 'Finalités',
-    body: "Les renseignements collectés sont utilisés uniquement pour répondre à vos demandes et améliorer l'expérience du site. Ils ne sont jamais vendus.",
-  },
-  {
-    title: 'Partage',
-    body: "Vos renseignements peuvent être partagés avec Google Analytics (analyse anonyme) et Meta Pixel (publicité). Ces services ont leurs propres politiques.",
-  },
-  {
-    title: 'Conservation',
-    body: "Les messages reçus par formulaire sont conservés 12 mois, puis supprimés.",
-  },
-  {
-    title: 'Vos droits (Loi 25)',
-    body: (
-      <>
-        Conformément à la Loi 25, vous avez le droit de consulter, corriger, supprimer
-        vos renseignements et retirer votre consentement. Contact :{' '}
-        <a href="mailto:contact@dangelwellness.ca">contact@dangelwellness.ca</a>
-      </>
-    ),
-  },
-  {
-    title: 'Cookies',
-    body: "Ce site utilise des cookies analytiques (Google Analytics) et publicitaires (Meta Pixel). Vous pouvez refuser les cookies non essentiels via la bannière de consentement affichée à votre première visite.",
-  },
-  {
-    title: 'Modifications',
-    body: "Cette politique peut être modifiée à tout moment. La version en vigueur est toujours disponible sur cette page. Dernière mise à jour : juillet 2025.",
-  },
-]
-
-// Props: isOpen (bool), onClose (fn)
-export default function PolicyModal({ isOpen, onClose }) {
+// Props: isOpen (bool), onClose (fn), lang — content is fetched here
+// (usePolicyPage) and rendered via the same <PolicyContent> the public
+// /privacy-policy route uses, so the two never drift apart.
+export default function PolicyModal({ isOpen, onClose, lang }) {
   const overlayRef = useRef(null)
   const closeRef = useRef(null)
   const triggerRef = useRef(null)
+  const strings = t(lang).policyModal
 
-  // Focus the close button on open, and return focus to the trigger on close.
+  const { page, loading, resolvedLang } = usePolicyPage(lang)
+
+  // Focus the close button on open, and return focus to whatever triggered
+  // the modal on close.
   useEffect(() => {
     if (isOpen) {
       triggerRef.current = document.activeElement
@@ -73,10 +35,13 @@ export default function PolicyModal({ isOpen, onClose }) {
     return () => document.removeEventListener('keydown', onKey)
   }, [isOpen, onClose])
 
-  // Lock body scroll while open.
+  // Lock body scroll while open — restore whatever overflow value was
+  // already there before we touched it, not an assumed ''.
   useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
+    if (!isOpen) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = previousOverflow }
   }, [isOpen])
 
   // Focus trap: keep Tab cycling within the modal panel.
@@ -102,6 +67,11 @@ export default function PolicyModal({ isOpen, onClose }) {
     }
   }
 
+  const handleManageCookies = () => {
+    clearConsent()
+    onClose()
+  }
+
   if (!isOpen) return null
 
   return (
@@ -116,29 +86,26 @@ export default function PolicyModal({ isOpen, onClose }) {
     >
       <div className="pmodal__panel">
         <div className="pmodal__header">
-          <p className="pmodal__title" id="policy-modal-title">Politique de confidentialité</p>
+          <p className="pmodal__title" id="policy-modal-title">{page?.title || strings.title}</p>
           <button
             ref={closeRef}
             className="pmodal__close"
             onClick={onClose}
-            aria-label="Fermer la politique de confidentialité"
+            aria-label={strings.close}
           >
             ✕
           </button>
         </div>
 
         <div className="pmodal__body">
-          {SECTIONS.map((section, i) => (
-            <div className="pmodal__section" key={section.title}>
-              <h2>{section.title}</h2>
-              <p>{section.body}</p>
-              {i < SECTIONS.length - 1 && <hr className="pmodal__divider" />}
-            </div>
-          ))}
+          <PolicyContent page={page} loading={loading} lang={lang} resolvedLang={resolvedLang} />
         </div>
 
         <div className="pmodal__footer">
-          <button className="pmodal__close-btn" onClick={onClose}>Fermer</button>
+          <button type="button" className="pmodal__manage-cookies" onClick={handleManageCookies}>
+            {strings.manageCookies}
+          </button>
+          <button className="pmodal__close-btn" onClick={onClose}>{strings.close}</button>
         </div>
       </div>
     </div>

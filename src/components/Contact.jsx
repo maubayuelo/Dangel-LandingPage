@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import emailjs from '@emailjs/browser'
 import '../styles/contact.css'
+import { t } from '../lib/i18n'
 
 const EJS_SERVICE       = import.meta.env.VITE_EMAILJS_SERVICE_ID
 const EJS_TEMPLATE      = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
 const EJS_NOTIF         = import.meta.env.VITE_EMAILJS_NOTIFICATION_TEMPLATE_ID
 const EJS_KEY           = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
 
-export default function Contact({ data: d, onOpenPolicy }) {
+export default function Contact({ data: d, onOpenPolicy, lang }) {
+  const strings = t(lang).contact
   const [form, setForm]         = useState({ name: '', email: '', message: '' })
   const [sent, setSent]         = useState(false)
   const [sending, setSending]   = useState(false)
@@ -157,24 +159,29 @@ export default function Contact({ data: d, onOpenPolicy }) {
                         <span className="contact__consent-box" aria-hidden="true" />
                       </span>
                       <span className="contact__consent-label">
-                        J&apos;ai lu et j&apos;accepte la{' '}
+                        {strings.consentPrefix}{' '}
                         <button
                           type="button"
                           className="contact__consent-link"
                           onClick={onOpenPolicy}
                         >
-                          politique de confidentialité
+                          {strings.consentLink}
                         </button>.
                       </span>
                     </label>
                     {consentError && (
                       <p className="contact__consent-error" role="alert">
-                        Veuillez accepter la politique de confidentialité pour continuer.
+                        {strings.consentError}
                       </p>
                     )}
                   </div>
 
-                  <button type="submit" className="btn-primary" disabled={sending}>
+                  {/* The service offered is wellness care — visitors sometimes over-share
+                      health details in a contact form. The published policy promises this
+                      note is shown, so it's not optional copy. */}
+                  <p className="contact__health-note">{strings.healthNote}</p>
+
+                  <button type="submit" className="btn-primary" disabled={sending || !consent}>
                     {sending ? '…' : `→ ${d.contactFormCtaLabel || 'Envoyer'}`}
                   </button>
                   {error && <p className="contact__error">{error}</p>}

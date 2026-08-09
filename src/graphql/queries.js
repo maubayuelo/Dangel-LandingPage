@@ -36,9 +36,13 @@ export const GET_PAGE = gql`
       # with nlLabel (display text) and nlAnchor (the #section-id to scroll to).
       fgNavigation {
         navLogoText
-        navLogoImage { node { sourceUrl altText } }
+        navLogoImage { node { sourceUrl srcSet altText mediaDetails { width height } } }
         navLinks { nlLabel nlAnchor }
         navCtaLabel
+        # SEO per-language overrides — Translation Preference must be "Translate"
+        # in ACF for these to differ across en/fr/es. Falls back to fgGlobal.
+        seoTitle
+        seoDescription
       }
 
       # ── Global / site-wide settings ─────────────────────────────────────────
@@ -77,7 +81,8 @@ export const GET_PAGE = gql`
         heroTrustText
         heroCtaPrimaryLabel
         heroCtaSecondaryLabel
-        heroPhoto { node { sourceUrl altText } }
+        heroPhoto { node { sourceUrl srcSet altText mediaDetails { width height } } }
+        heroPhotoAlt
       }
 
       # ── Benefits ────────────────────────────────────────────────────────────
@@ -129,7 +134,8 @@ export const GET_PAGE = gql`
         aboutDiffBody
         aboutDisciplinesList
         aboutCtaLabel
-        aboutPhoto { node { sourceUrl altText } }
+        aboutPhoto { node { sourceUrl srcSet altText mediaDetails { width height } } }
+        aboutPhotoAlt
         aboutPhotoCaption
         aboutLanguages { langFlag langLabel }
         aboutCertifications { certTitle certMeta certBadge certIcon }
@@ -209,6 +215,27 @@ export const GET_PAGE = gql`
         footerSocialTitle
         footerSocialItems { fsName fsUrl }
         footerCopyright
+      }
+    }
+  }
+`
+
+// GET_POLICY_PAGE — the privacy policy page, one WordPress page per language
+// (WPML), same idType: URI pattern as GET_PAGE. The policy BODY is the
+// page's native `content` (WPML-translated, edited in the normal WP editor)
+// — not an ACF field, deliberately, to keep this to one field group instead
+// of duplicating rich text across three ACF fields.
+export const GET_POLICY_PAGE = gql`
+  query GetPolicyPage($pageId: ID!) {
+    page(id: $pageId, idType: URI) {
+      title
+      content
+      # ACF field group: fg_policies
+      # policyLastUpdated: Date Picker, per-language (Multilingual Setup: Translate)
+      # policyContactEmail: Text, same value copied across languages (Copy)
+      fgPolicies {
+        policyLastUpdated
+        policyContactEmail
       }
     }
   }

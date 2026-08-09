@@ -35,12 +35,18 @@ import DOMPurify from 'dompurify'
 // Importing the CSS file for this component. Vite (the build tool) processes
 // this import and injects the CSS into the page automatically.
 import '../styles/hero.css'
+import Picture from './Picture'
+import { resolveAlt } from '../lib/resolveAlt'
 
 // Fallback image URL shown when heroPhoto hasn't been set in WordPress.
 // placehold.co generates placeholder images with custom dimensions and colors.
 // Using a constant at module level (not inside the function) means it's created
 // once, not on every render.
 const PHOTO_FALLBACK = 'https://placehold.co/440x587/F7F4EE/9B9790?text=Photo'
+
+// Layout: full viewport width up to the 1024px breakpoint, where hero.css
+// switches to a fixed 440px column (--col-photo) — see src/styles/hero.css.
+const PHOTO_SIZES = '(min-width: 1024px) 440px, 100vw'
 
 // ── Helper function ───────────────────────────────────────────────────────────
 // PROBLEM: WordPress "wpautop" feature automatically wraps text fields in <p>
@@ -78,12 +84,14 @@ export default function Hero({ data: h, onBook }) {
   // defensive practice for every component to handle missing data.)
   if (!h) return null
 
-  // Optional chaining (?.) to safely navigate nested object properties.
-  // h.heroPhoto?.node?.sourceUrl means: if heroPhoto exists AND node exists,
-  // return sourceUrl. Otherwise return undefined (triggering the fallback).
-  // The || operator returns the right side when the left is falsy (undefined, null, '').
-  const photoUrl = h.heroPhoto?.node?.sourceUrl || PHOTO_FALLBACK
-  const photoAlt = h.heroPhoto?.node?.altText || 'Dangel, thérapeute holistique'
+  // Alt text priority: heroPhotoAlt (ACF, per-language) → Media Library
+  // altText → hardcoded default. See lib/resolveAlt.js.
+  const photoAlt = resolveAlt({
+    acf: h.heroPhotoAlt,
+    mediaAlt: h.heroPhoto?.node?.altText,
+    hardcoded: 'Dangel, thérapeute holistique',
+    imageName: 'Hero photo',
+  })
 
   return (
     // <section> is a semantic HTML5 element — groups thematically related content.
@@ -102,7 +110,15 @@ export default function Hero({ data: h, onBook }) {
             Both attributes together optimize the LCP (Largest Contentful Paint)
             score, which affects Google PageSpeed / Core Web Vitals ranking.
           */}
-          <img src={photoUrl} alt={photoAlt} loading="eager" fetchPriority="high" />
+          <Picture
+            image={h.heroPhoto}
+            alt={photoAlt}
+            sizes={PHOTO_SIZES}
+            eager
+            fallbackSrc={PHOTO_FALLBACK}
+            fallbackWidth={440}
+            fallbackHeight={587}
+          />
         </div>
 
         {/* Content column */}

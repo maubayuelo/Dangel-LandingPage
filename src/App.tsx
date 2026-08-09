@@ -21,9 +21,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 // useState: hook for values that change over time and trigger re-renders
-// useEffect: hook for running side effects (DOM mutations, timers, subscriptions)
-// after the component renders
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 // useQuery: Apollo hook that runs a GraphQL query and returns { data, loading, error }
 // This is the ONLY component in the app that calls useQuery — by design.
@@ -32,9 +30,14 @@ import { useQuery } from '@apollo/client'
 import { GET_PAGE } from './graphql/queries'
 import type { PageData } from './graphql/types'
 import { useLanguage } from './hooks/useLanguage'
+import { useRoute } from './hooks/useRoute'
 // Loading skeleton styles — the animated grey bars shown while GraphQL fetches
 import './styles/loading-skeleton.css'
 import { useAnalytics } from './hooks/useAnalytics'
+import { useDocumentHead } from './hooks/useDocumentHead'
+import { LANG_PAGE_URIS } from './lib/urls'
+import { policyPathFor } from './lib/routes'
+import { t } from './lib/i18n'
 
 // Each import below is a React component = a JS function that returns JSX
 import Nav from './components/Nav'
@@ -50,7 +53,9 @@ import CtaFinal from './components/CtaFinal'
 import Footer from './components/Footer'
 import BookingModal from './components/BookingModal'
 import PolicyModal from './components/PolicyModal'
+import PolicyPage from './components/PolicyPage'
 import CookieBanner from './components/CookieBanner'
+import BackToTop from './components/BackToTop'
 // ErrorBoundary: catches crashes inside a section and shows a friendly fallback
 // instead of crashing the whole page. See components/ErrorBoundary.jsx.
 import ErrorBoundary from './components/ErrorBoundary'
@@ -66,6 +71,7 @@ export default function App() {
   // call other hooks internally. This one reads the URL path or localStorage
   // to determine which language to display (en / fr / es).
   const { lang, changeLang } = useLanguage()
+  const view = useRoute()
 
   // useState(false) declares a state variable. Returns [currentValue, setter].
   // When setModalOpen(true) is called, React re-renders App and all children.
@@ -75,15 +81,6 @@ export default function App() {
   // Same pattern as modalOpen above, but for the privacy policy document —
   // opened from the Contact form's consent checkbox and the CookieBanner link.
   const [policyOpen, setPolicyOpen] = useState(false)
-
-  // ── Language → WordPress page URI mapping ───────────────────────────────────
-  // WPML creates a separate WordPress page for each language translation.
-  // We map the current language code to its WordPress URI so GraphQL knows
-  // which translated page to return.
-  // Record<string, string> allows indexing by `lang` (a string).
-  // Without this type annotation, TypeScript infers the literal type
-  // { en: string; fr: string; es: string } which rejects string-key access.
-  const LANG_PAGE_URIS: Record<string, string> = { en: '/home/', fr: '/fr/accueil/', es: '/es/inicio/' }
 
   // ── GraphQL data fetch ──────────────────────────────────────────────────────
   // useQuery sends the GET_PAGE query to WordPress GraphQL and returns:
@@ -112,45 +109,31 @@ export default function App() {
   const p = data?.page       // the full page object from WordPress
   const g = p?.fgGlobal      // the global settings field group (phone, email, etc.)
 
-  // ── SEO: update <head> tags dynamically from WordPress ──────────────────────
-  // useEffect(fn, [deps]) runs fn AFTER the component renders.
-  // The second argument [g] is the dependency array — the effect re-runs only
-  // when g changes (i.e. when new data arrives from WordPress).
-  // This pattern lets the CMS control meta tags without rebuilding the app.
-  useEffect(() => {
-    // Guard clause: if g is undefined (data not yet loaded), do nothing
-    if (!g) return
-
-    if (g.globalSeoTitle) {
-      // document.title directly sets the browser tab title
-      document.title = g.globalSeoTitle
-      // querySelector finds a DOM element by CSS selector — here we find the
-      // existing <meta> tag in index.html and update its content attribute
-      document.querySelector('meta[property="og:title"]')?.setAttribute('content', g.globalSeoTitle)
-      document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', g.globalSeoTitle)
-    }
-    if (g.globalSeoDescription) {
-      document.querySelector('meta[name="description"]')?.setAttribute('content', g.globalSeoDescription)
-      document.querySelector('meta[property="og:description"]')?.setAttribute('content', g.globalSeoDescription)
-      document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', g.globalSeoDescription)
-    }
-    // OG image — not yet active. To enable:
-    //   1. Add Text field "global_seo_og_image_url" in WP Admin → ACF → fg_global
-    //   2. Uncomment globalSeoOgImageUrl in queries.js AND in src/graphql/types.ts
-    //   3. Uncomment the block below
-    // if (g.globalSeoOgImageUrl) {
-    //   document.querySelector('meta[property="og:image"]')?.setAttribute('content', g.globalSeoOgImageUrl)
-    //   document.querySelector('meta[name="twitter:image"]')?.setAttribute('content', g.globalSeoOgImageUrl)
-    // }
-  }, [g]) // re-run this effect whenever g changes
+  // ── SEO: update <head> tags dynamically, per language ────────────────────────
+  // seoTitle/seoDescription come from fgNavigation (per-language, ACF Translate
+  // preference). fgGlobal.globalSeo* stays as a fallback during the migration —
+  // see TODO in useDocumentHead.js. globalSeoOgImageUrl is not active yet (no WP
+  // field): to enable, add it in WP ACF fg_global, then uncomment in
+  // queries.js + types.ts and pass it below instead of undefined.
+  // On the policy view, title/description come from the i18n fallback (the
+  // WP page's own <h1> is rendered separately by PolicyPage) and the page
+  // is noindexed — it shouldn't compete with the homepage for ranking.
+  useDocumentHead({
+    lang,
+    seoTitle: view === 'policy' ? t(lang).policyPage.emptyTitle : (p?.fgNavigation?.seoTitle || g?.globalSeoTitle),
+    seoDescription: view === 'policy' ? t(lang).policyPage.metaDescription : (p?.fgNavigation?.seoDescription || g?.globalSeoDescription),
+    ogImage: undefined,
+    path: view === 'policy' ? policyPathFor(lang) : undefined,
+    noindex: view === 'policy',
+  })
 
   // ── Analytics ────────────────────────────────────────────────────────────────
-  // Passes analytics IDs from WordPress to the analytics hook.
-  // The hook does nothing when the strings are empty (IDs not yet configured).
-  // Fill globalMetaPixelId and globalGa4Id in WP Admin to activate tracking.
+  // Passes analytics IDs from WordPress to the analytics hook. No hardcoded
+  // fallback — the hook only fires once a real ACF-provided ID exists AND
+  // the visitor has given explicit consent (Loi 25). See useAnalytics.js.
   useAnalytics({
-    metaPixelId: g?.globalMetaPixelId || '1270461003083108',
-    ga4Id: g?.globalGa4Id || '',
+    metaPixelId: g?.globalMetaPixelId,
+    ga4Id: g?.globalGa4Id,
   })
 
   // ── Modal helpers ─────────────────────────────────────────────────────────────
@@ -242,8 +225,8 @@ export default function App() {
   // the loading check above, p should always be defined here).
   return (
     <>
-      {/* Fixed bottom bar, only rendered once (no consent choice stored yet). */}
-      <CookieBanner onOpenPolicy={openPolicy} />
+      {/* Fixed bottom bar, shown whenever there's no stored consent choice. */}
+      <CookieBanner lang={lang} onOpenPolicy={openPolicy} />
 
       {/* Nav receives both data AND callbacks (onLangChange, onBook) as props */}
       <Nav
@@ -253,26 +236,35 @@ export default function App() {
         onBook={openModal}
       />
 
-      {/* <main> is a semantic HTML landmark — tells browsers/screen readers this
-          is the primary content area (not nav or footer).
-          Each section is wrapped in <ErrorBoundary> so a crash in one section
-          (e.g. a missing WordPress field) shows a small fallback message and
-          leaves every other section on screen. Without these wrappers, one
-          broken section would make the entire <main> disappear. */}
-      <main>
-        <ErrorBoundary><Hero data={p?.fgHero} onBook={openModal} /></ErrorBoundary>
-        <ErrorBoundary><Benefits data={p?.fgBenefits} /></ErrorBoundary>
-        <ErrorBoundary><Services data={p?.fgServices} onBook={openModal} /></ErrorBoundary>
-        <ErrorBoundary><Process data={p?.fgProcess} /></ErrorBoundary>
-        <ErrorBoundary><About data={p?.fgAbout} onBook={openModal} /></ErrorBoundary>
-        <ErrorBoundary><Testimonials data={p?.fgTestimonials} lang={lang} /></ErrorBoundary>
-        <ErrorBoundary><FAQ data={p?.fgFaq} /></ErrorBoundary>
-        <ErrorBoundary><Contact data={p?.fgContact} onOpenPolicy={openPolicy} /></ErrorBoundary>
-        <ErrorBoundary><CtaFinal data={p?.fgCtaFinal} onBook={openModal} /></ErrorBoundary>
-      </main>
+      {/* Two views only: the landing page, or the public policy route
+          (/en/privacy-policy etc. — see lib/router.js). Nav/Footer/modals
+          stay mounted across both so navigation and consent state persist. */}
+      {view === 'policy' ? (
+        <ErrorBoundary><PolicyPage lang={lang} /></ErrorBoundary>
+      ) : (
+        /* <main> is a semantic HTML landmark — tells browsers/screen readers this
+            is the primary content area (not nav or footer).
+            Each section is wrapped in <ErrorBoundary> so a crash in one section
+            (e.g. a missing WordPress field) shows a small fallback message and
+            leaves every other section on screen. Without these wrappers, one
+            broken section would make the entire <main> disappear. */
+        <main>
+          <ErrorBoundary><Hero data={p?.fgHero} onBook={openModal} /></ErrorBoundary>
+          <ErrorBoundary><Benefits data={p?.fgBenefits} /></ErrorBoundary>
+          <ErrorBoundary><Services data={p?.fgServices} onBook={openModal} /></ErrorBoundary>
+          <ErrorBoundary><Process data={p?.fgProcess} /></ErrorBoundary>
+          <ErrorBoundary><About data={p?.fgAbout} onBook={openModal} /></ErrorBoundary>
+          <ErrorBoundary><Testimonials data={p?.fgTestimonials} lang={lang} /></ErrorBoundary>
+          <ErrorBoundary><FAQ data={p?.fgFaq} /></ErrorBoundary>
+          <ErrorBoundary><Contact data={p?.fgContact} onOpenPolicy={openPolicy} lang={lang} /></ErrorBoundary>
+          <ErrorBoundary><CtaFinal data={p?.fgCtaFinal} onBook={openModal} /></ErrorBoundary>
+        </main>
+      )}
 
-      {/* Footer gets BOTH fgFooter AND fgGlobal — it uses phone/email from global */}
-      <ErrorBoundary><Footer data={p?.fgFooter} global={g} onOpenPolicy={openPolicy} /></ErrorBoundary>
+      {/* Footer gets BOTH fgFooter AND fgGlobal — it uses phone/email from global.
+          Its own policy link navigates to the real URL, not this modal — see
+          Footer.jsx. */}
+      <ErrorBoundary><Footer data={p?.fgFooter} global={g} lang={lang} /></ErrorBoundary>
 
       {/* BookingModal is always in the DOM but returns null when open=false.
           This avoids unmounting/remounting the iframe on every open/close. */}
@@ -283,8 +275,12 @@ export default function App() {
         lang={lang}
       />
 
-      {/* Same always-in-DOM pattern as BookingModal — returns null when closed. */}
-      <PolicyModal isOpen={policyOpen} onClose={closePolicy} />
+      {/* Same always-in-DOM pattern as BookingModal — returns null when closed.
+          Quick preview opened from the cookie banner / contact form consent
+          link; the Footer links to the real page instead. */}
+      <PolicyModal isOpen={policyOpen} onClose={closePolicy} lang={lang} />
+
+      <BackToTop lang={lang} />
     </>
   )
 }

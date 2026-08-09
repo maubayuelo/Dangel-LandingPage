@@ -1,5 +1,12 @@
 import { useState } from 'react'
 import '../styles/nav.css'
+import Picture from './Picture'
+import { getView, navigate } from '../lib/router'
+import { LANG_PATHS } from '../lib/urls'
+
+// .nav__logo-img is a fixed 45px-tall mark (width: auto) at every
+// breakpoint — no responsive layout change, so a single size hint suffices.
+const LOGO_SIZES = '180px'
 
 export default function Nav({ data: d, lang, onLangChange, onBook }) {
   const [open, setOpen] = useState(false)
@@ -7,22 +14,35 @@ export default function Nav({ data: d, lang, onLangChange, onBook }) {
   const ctaLabel = d?.navCtaLabel || 'Réserver'
   const logoText = d?.navLogoText || 'Dangel'
   const logoSrc = d?.navLogoImage?.node?.sourceUrl
-  const logoAlt = d?.navLogoImage?.node?.altText || logoText
 
+  // Section anchors (#services, #about, ...) only exist on the home view —
+  // on the policy page (/en/privacy-policy etc.) that <main> isn't mounted.
+  // Navigate home first when needed, then scroll once it has re-rendered.
   const scrollTo = (anchor) => {
     const id = anchor.replace('#', '')
     setOpen(false)
+    const cameFromPolicy = getView() === 'policy'
+    if (cameFromPolicy) navigate(LANG_PATHS[lang] || LANG_PATHS.en)
     setTimeout(() => {
       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 50)
+    }, cameFromPolicy ? 80 : 50)
+  }
+
+  const goHome = () => {
+    if (getView() === 'policy') {
+      navigate(LANG_PATHS[lang] || LANG_PATHS.en)
+      setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 80)
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }
 
   return (
     <nav className="nav" aria-label="Navigation principale">
       <div className="nav__inner">
-        <button className="nav__logo" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+        <button className="nav__logo" onClick={goHome}>
           {logoSrc
-            ? <img src={logoSrc} alt={logoAlt} className="nav__logo-img" />
+            ? <Picture image={d.navLogoImage} alt={logoText} sizes={LOGO_SIZES} eager className="nav__logo-img" />
             : logoText}
         </button>
 

@@ -31,8 +31,10 @@
 // Used by fgHero.heroPhoto and fgAbout.aboutPhoto.
 export interface WPImage {
   node: {
-    sourceUrl: string
-    altText:   string
+    sourceUrl:      string
+    altText:        string
+    srcSet?:        string | null
+    mediaDetails?:  { width: number; height: number } | null
   }
 }
 
@@ -45,10 +47,12 @@ export interface NavLink {
 }
 
 export interface FgNavigation {
-  navLogoText?:  string | null
-  navLogoImage?: WPImage | null
-  navLinks?:     NavLink[] | null
-  navCtaLabel?:  string | null
+  navLogoText?:     string | null
+  navLogoImage?:    WPImage | null
+  navLinks?:        NavLink[] | null
+  navCtaLabel?:     string | null
+  seoTitle?:        string | null
+  seoDescription?:  string | null
 }
 
 // ── fgGlobal (fg_global) ─────────────────────────────────────────────────────
@@ -83,6 +87,7 @@ export interface FgHero {
   heroCtaPrimaryLabel?:   string | null
   heroCtaSecondaryLabel?: string | null
   heroPhoto?:             WPImage | null
+  heroPhotoAlt?:          string | null
 }
 
 // ── fgBenefits (fg_benefits) ─────────────────────────────────────────────────
@@ -153,6 +158,7 @@ export interface FgAbout {
   aboutDisciplinesList?:  string | null  // HTML <ul><li> — parse with parseListItems()
   aboutCtaLabel?:         string | null
   aboutPhoto?:            WPImage | null
+  aboutPhotoAlt?:         string | null
   aboutPhotoCaption?:     string | null
   aboutLanguages?:        AboutLanguage[] | null
 }
@@ -283,4 +289,21 @@ export interface PageData {
   fgContact?:     FgContact     | null
   fgCtaFinal?:    FgCtaFinal    | null
   fgFooter?:      FgFooter      | null
+}
+
+// ── fgPolicies (fg_policies) ─────────────────────────────────────────────────
+// policyLastUpdated: ACF Date Picker — WPGraphQL returns an ISO 8601 string
+// (e.g. "2026-08-08T00:00:00+00:00"), format it client-side with
+// Intl.DateTimeFormat per the active language rather than storing a
+// pre-formatted string in WordPress.
+export interface FgPolicies {
+  policyLastUpdated?:  string | null
+  policyContactEmail?: string | null
+}
+
+// ── PolicyPageData — the full shape of data.page from GET_POLICY_PAGE ────────
+export interface PolicyPageData {
+  title?:       string | null
+  content?:     string | null  // raw HTML, native WP content — sanitize before rendering
+  fgPolicies?:  FgPolicies | null
 }

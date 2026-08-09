@@ -1,9 +1,15 @@
 import '../styles/footer.css'
+import { navigate } from '../lib/router'
+import { policyPathFor } from '../lib/routes'
+import { clearConsent } from '../lib/consent'
+import { t } from '../lib/i18n'
 
-export default function Footer({ data: d, global: g, onOpenPolicy }) {
+export default function Footer({ data: d, global: g, lang }) {
   if (!d) return null
   const navItems = d.footerNavItems || []
   const socialItems = d.footerSocialItems || []
+  const strings = t(lang).footer
+  const policyPath = policyPathFor(lang)
 
   return (
     <footer className="footer">
@@ -66,13 +72,24 @@ export default function Footer({ data: d, global: g, onOpenPolicy }) {
               {d.footerCopyright || `© ${new Date().getFullYear()} Dangel. Tous droits réservés.`}
             </p>
             <span className="footer-bottom-sep" aria-hidden="true"> · </span>
+            {/* Real, crawlable href — Meta and Google need an actual public
+                URL to point ad/analytics disclosures at, not a JS-only modal.
+                preventDefault + navigate() still gives real visitors an SPA
+                transition instead of a full reload. */}
+            <a
+              href={policyPath}
+              className="footer-policy-btn"
+              onClick={(e) => { e.preventDefault(); navigate(policyPath) }}
+            >
+              {strings.policyLink}
+            </a>
+            <span className="footer-bottom-sep" aria-hidden="true"> · </span>
             <button
               type="button"
               className="footer-policy-btn"
-              onClick={onOpenPolicy}
-              aria-label="Voir la politique de confidentialité"
+              onClick={() => clearConsent()}
             >
-              Politique de confidentialité
+              {strings.manageCookies}
             </button>
           </div>
         </div>

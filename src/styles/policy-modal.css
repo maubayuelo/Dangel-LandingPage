@@ -28,12 +28,18 @@
   display: flex;
   flex-direction: column;
   width: min(640px, 90vw);
-  max-height: 82vh;
+  max-height: 85vh;
   background: var(--cream-light);
   border-radius: 8px;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18);
   overflow: hidden;
   animation: pmodal-scale-in 280ms ease-out;
+}
+
+@media (min-width: 768px) {
+  .pmodal__panel {
+    max-height: 82vh;
+  }
 }
 
 @keyframes pmodal-scale-in {
@@ -99,45 +105,129 @@
   border-radius: var(--radius-badge);
 }
 
-.pmodal__section h2 {
+/* ── Policy content — shared by PolicyModal and PolicyPage ────────────── */
+/* The WordPress native `content` field renders h1–h4/p/ul/ol/li/strong/em/a/br
+   (see lib/sanitizeHtml.js allowlist) inside .policy-content__body. */
+.policy-content {
   font-family: var(--font-body);
+  color: var(--pmodal-body-text);
+}
+
+.policy-content--loading {
+  display: flex;
+  flex-direction: column;
+}
+
+.policy-content__notice {
   font-size: var(--text-13);
+  color: var(--carbon);
+  background: var(--cream);
+  border: var(--border-1) solid var(--pmodal-border);
+  border-radius: var(--radius-btn-sm);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.policy-content__body h1,
+.policy-content__body h2,
+.policy-content__body h3,
+.policy-content__body h4 {
+  font-family: var(--font-body);
   font-weight: 600;
   color: var(--carbon);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-top: var(--space-6);
   margin-bottom: var(--space-2);
 }
 
-.pmodal__section p {
-  font-family: var(--font-body);
-  font-size: var(--text-15);
-  font-weight: 400;
-  color: var(--pmodal-body-text);
-  line-height: var(--leading-relaxed);
+.policy-content__body h1:first-child,
+.policy-content__body h2:first-child {
+  margin-top: 0;
 }
 
-.pmodal__section p a {
+.policy-content__body h2 {
+  font-size: var(--text-15);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.policy-content__body h3,
+.policy-content__body h4 {
+  font-size: var(--text-14);
+}
+
+.policy-content__body p {
+  font-size: var(--text-15);
+  font-weight: 400;
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-3);
+}
+
+.policy-content__body ul,
+.policy-content__body ol {
+  font-size: var(--text-15);
+  line-height: var(--leading-relaxed);
+  padding-left: 1.25em;
+  margin-bottom: var(--space-3);
+}
+
+.policy-content__body li {
+  margin-bottom: var(--space-1);
+}
+
+.policy-content__body a {
   color: var(--teal);
   text-decoration: none;
 }
-.pmodal__section p a:hover {
+.policy-content__body a:hover {
   text-decoration: underline;
 }
 
-.pmodal__divider {
-  border: none;
+.policy-content__body strong {
+  color: var(--carbon);
+  font-weight: 600;
+}
+
+.policy-content__meta {
+  font-size: var(--text-12);
+  color: var(--text-dimmer);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
   border-top: var(--border-1) solid var(--pmodal-border);
-  margin: var(--space-4) 0;
+}
+
+.policy-content__meta a {
+  color: var(--teal);
+  text-decoration: none;
+}
+.policy-content__meta a:hover {
+  text-decoration: underline;
 }
 
 /* ── Footer ────────────────────────────────────── */
 .pmodal__footer {
   flex: 0 0 auto;
   display: flex;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
   padding: var(--space-4) var(--space-6);
   border-top: var(--border-1) solid var(--pmodal-border);
+}
+
+.pmodal__manage-cookies {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: var(--text-13);
+  color: var(--text-dimmer);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.pmodal__manage-cookies:hover,
+.pmodal__manage-cookies:focus-visible {
+  color: var(--carbon);
 }
 
 .pmodal__close-btn {
@@ -153,4 +243,30 @@
 }
 .pmodal__close-btn:hover {
   opacity: 0.9;
+}
+
+/* ── PolicyPage — the public /privacy-policy route ─────────────────────── */
+.policy-page {
+  background: var(--cream);
+  padding-block: var(--section-py);
+  min-height: 60vh;
+}
+
+.policy-page__inner {
+  max-width: 720px;
+}
+
+.policy-page__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-40);
+  font-weight: 700;
+  color: var(--carbon);
+  line-height: var(--leading-snug);
+  margin-bottom: var(--space-8);
+}
+
+@media (min-width: 1024px) {
+  .policy-page__title {
+    font-size: var(--text-44);
+  }
 }

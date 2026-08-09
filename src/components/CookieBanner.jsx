@@ -1,63 +1,61 @@
 import { useEffect, useState } from 'react'
 import '../styles/cookie-banner.css'
+import { getConsent, setConsent, subscribeConsent } from '../lib/consent'
+import { t } from '../lib/i18n'
 
-const CONSENT_KEY = 'dangel_cookie_consent'
 const ENTRANCE_DELAY_MS = 1200
 
-// ── Public getter — GA4 / Meta Pixel hooks check this before firing ─────────
-// Returns 'accepted' | 'declined' | null (no choice made yet)
-export function getCookieConsent() {
-  return localStorage.getItem(CONSENT_KEY)
-}
-
-// Props: onOpenPolicy (fn) — opens PolicyModal from the "Politique de
-// confidentialité" link
-export default function CookieBanner({ onOpenPolicy }) {
-  const [visible, setVisible] = useState(false)
+// Props: lang (drives displayed strings, re-renders on language switch
+// without remount), onOpenPolicy (fn — opens PolicyModal for a quick
+// preview; the Footer's own policy link goes to the real crawlable URL
+// instead, see Footer.jsx)
+export default function CookieBanner({ lang, onOpenPolicy }) {
+  const strings = t(lang).cookieBanner
+  const [visible, setVisible] = useState(() => getConsent() === null)
   const [entered, setEntered] = useState(false)
 
-  // Only show on first visit — no stored consent yet.
+  // Reacts to consent changes from anywhere — this banner's own buttons,
+  // the "Gérer les témoins" link in the Footer or PolicyModal, or another
+  // tab. Reappears whenever consent goes back to null.
   useEffect(() => {
-    if (getCookieConsent()) return
-    setVisible(true)
+    return subscribeConsent((value) => setVisible(value == null))
   }, [])
 
   // Slide in 1200ms after mount, once we know the banner should show at all.
   useEffect(() => {
-    if (!visible) return
-    const t = setTimeout(() => setEntered(true), ENTRANCE_DELAY_MS)
-    return () => clearTimeout(t)
+    if (!visible) {
+      setEntered(false)
+      return
+    }
+    const timer = setTimeout(() => setEntered(true), ENTRANCE_DELAY_MS)
+    return () => clearTimeout(timer)
   }, [visible])
 
-  const choose = (value) => {
-    localStorage.setItem(CONSENT_KEY, value)
-    setEntered(false)
-    setVisible(false)
-  }
+  const choose = (value) => setConsent(value)
 
   if (!visible) return null
 
   return (
     <div
       className={`cbanner${entered ? ' cbanner--entered' : ''}`}
-      role="region"
-      aria-label="Gestion des cookies"
+      role="dialog"
+      aria-live="polite"
+      aria-label={strings.ariaLabel}
     >
       <div className="cbanner__inner">
         <p className="cbanner__text">
-          Ce site utilise des cookies pour analyser le trafic et améliorer votre
-          expérience.{' '}
+          {strings.message}{' '}
           <button type="button" className="cbanner__link" onClick={onOpenPolicy}>
-            Politique de confidentialité →
+            {strings.policyLink}
           </button>
         </p>
 
         <div className="cbanner__actions">
           <button type="button" className="cbanner__decline" onClick={() => choose('declined')}>
-            Refuser
+            {strings.decline}
           </button>
           <button type="button" className="cbanner__accept" onClick={() => choose('accepted')}>
-            Accepter
+            {strings.accept}
           </button>
         </div>
       </div>

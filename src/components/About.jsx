@@ -1,6 +1,12 @@
 import '../styles/about.css'
+import Picture from './Picture'
+import { resolveAlt } from '../lib/resolveAlt'
 
 const PHOTO_FALLBACK = 'https://placehold.co/440x587/F7F4EE/9B9790?text=Photo'
+
+// Same column layout as the hero photo — full width until the 1024px
+// breakpoint, then a fixed 440px column (--col-photo). See about.css.
+const PHOTO_SIZES = '(min-width: 1024px) 440px, 100vw'
 
 /* Decode HTML entities (e.g. &#038;, &amp;, &lt;) via the browser's own parser */
 function decodeEntities(str) {
@@ -68,8 +74,14 @@ export default function About({ data: d, onBook }) {
 
   const disciplines = parseListItems(d.aboutDisciplinesList || '')
   const langs = d.aboutLanguages || []
-  const photoUrl = d.aboutPhoto?.node?.sourceUrl || PHOTO_FALLBACK
-  const photoAlt = d.aboutPhoto?.node?.altText || 'Dangel en session'
+  // Alt text priority: aboutPhotoAlt (ACF, per-language) → Media Library
+  // altText → hardcoded default. See lib/resolveAlt.js.
+  const photoAlt = resolveAlt({
+    acf: d.aboutPhotoAlt,
+    mediaAlt: d.aboutPhoto?.node?.altText,
+    hardcoded: 'Dangel en session',
+    imageName: 'About photo',
+  })
 
   return (
     <section className="about" id="about">
@@ -77,7 +89,14 @@ export default function About({ data: d, onBook }) {
         <div className="about__inner">
 
           <div className="about__photo-col">
-            <img src={photoUrl} alt={photoAlt} loading="lazy" />
+            <Picture
+              image={d.aboutPhoto}
+              alt={photoAlt}
+              sizes={PHOTO_SIZES}
+              fallbackSrc={PHOTO_FALLBACK}
+              fallbackWidth={440}
+              fallbackHeight={587}
+            />
           </div>
 
           <div className="about__content">

@@ -15,6 +15,9 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useEffect } from 'react'
+import { LANG_PATHS } from '../lib/urls'
+import { getView, navigate as goToPath } from '../lib/router'
+import { policyPathFor } from '../lib/routes'
 
 // Array of valid language codes. Used to validate input and prevent
 // localStorage poisoning with unexpected values.
@@ -24,13 +27,13 @@ const SUPPORTED = ['en', 'fr', 'es']
 const STORAGE_KEY = 'dangel_lang'
 
 // ── Helper: read language from the URL path ──────────────────────────────────
-// window.location.pathname returns the URL path, e.g. "/fr/some-page"
-// split('/') → ['', 'fr', 'some-page']
-// .find() scans the array and returns the first element that is in SUPPORTED
-// e.g. 'fr' → returns 'fr'. If none found, returns undefined → null.
+// Only the FIRST path segment is ever a language code — everything after it
+// (e.g. "politique-de-confidentialite" in /fr/politique-de-confidentialite)
+// is route content, not language, and must never be mistaken for one.
+// "/" → [] → null. "/fr" or "/fr/" → 'fr'. "/es/politica-..." → 'es'.
 function getLangFromPath() {
-  const segment = window.location.pathname.split('/').find(s => SUPPORTED.includes(s))
-  return segment || null
+  const first = window.location.pathname.split('/').filter(Boolean)[0]
+  return SUPPORTED.includes(first) ? first : null
 }
 
 // ── Helper: determine the initial language on first render ───────────────────
@@ -65,10 +68,13 @@ export function useLanguage() {
     // Guard: ignore invalid language codes (defensive programming)
     if (!SUPPORTED.includes(newLang)) return
 
-    // window.history.pushState changes the browser URL without a page reload.
-    // Arguments: (state object, title [ignored by browsers], new URL)
-    // This makes the URL shareable: dangelwellness.ca/fr shows French content.
-    window.history.pushState({}, '', `/${newLang}`)
+    // Translate the URL, not just the language: if we're on the policy page,
+    // switching language must land on that page's translation
+    // (/fr/politique-de-confidentialite → /es/politica-de-confidencialidad),
+    // not bounce back to the home page. router.navigate() also fires
+    // 'dangel:routechange', so useRoute() re-evaluates the view immediately.
+    const targetPath = getView() === 'policy' ? policyPathFor(newLang) : LANG_PATHS[newLang]
+    goToPath(targetPath)
 
     // Persist choice to localStorage so the next visit starts in this language
     localStorage.setItem(STORAGE_KEY, newLang)
@@ -77,6 +83,20 @@ export function useLanguage() {
     // pageId → WordPress returns the translated page content
     setLang(newLang)
   }
+
+  // ── Normalize "/" to an explicit language prefix ─────────────────────────────
+  // "/" itself is never the canonical URL for any language (see lib/urls.js).
+  // A visitor landing on the bare root gets bounced to /en, /fr, or /es —
+  // whichever getInitialLang() already resolved above — using replaceState so
+  // this doesn't add a history entry (Back button keeps working normally) and
+  // doesn't reload the page. A crawler with no localStorage always lands on
+  // /en here, which matches the x-default hreflang.
+  useEffect(() => {
+    if (window.location.pathname === '/') {
+      window.history.replaceState({}, '', LANG_PATHS[lang])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // run once on mount, using the initial lang resolved by getInitialLang()
 
   // ── Sync on browser back/forward navigation ──────────────────────────────────
   // Problem: history.pushState changes the URL, but pressing browser Back/Forward

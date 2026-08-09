@@ -19,6 +19,12 @@
   transform: translateY(0);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .cbanner {
+    transition: none;
+  }
+}
+
 .cbanner__inner {
   max-width: 1200px;
   margin-inline: auto;
