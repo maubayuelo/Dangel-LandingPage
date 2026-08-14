@@ -216,6 +216,7 @@ export const GET_PAGE = gql`
         footerSocialTitle
         footerSocialItems { fsName fsUrl }
         footerCopyright
+        medicalDisclaimer
       }
     }
   }

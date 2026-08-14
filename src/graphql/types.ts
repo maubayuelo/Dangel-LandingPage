@@ -266,6 +266,7 @@ export interface FgFooter {
   footerSocialTitle?:  string | null
   footerSocialItems?:  FooterSocialItem[] | null
   footerCopyright?:    string | null
+  medicalDisclaimer?:  string | null
 }
 
 // ── PageData — the full shape of data.page from GET_PAGE ─────────────────────

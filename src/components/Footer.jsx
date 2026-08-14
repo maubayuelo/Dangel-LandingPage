@@ -67,6 +67,9 @@ export default function Footer({ data: d, global: g, lang }) {
         </div>
 
         <div className="footer__bottom">
+          {d.medicalDisclaimer && (
+            <p className="footer__disclaimer" role="note">{d.medicalDisclaimer}</p>
+          )}
           <div className="footer-bottom-row">
             <p className="footer__copy">
               {d.footerCopyright || `© ${new Date().getFullYear()} Dangel. Tous droits réservés.`}

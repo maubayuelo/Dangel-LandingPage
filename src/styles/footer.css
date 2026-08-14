@@ -89,6 +89,15 @@
   padding-top: var(--space-8);
 }
 
+.footer__disclaimer {
+  font-size: var(--text-11);
+  color: var(--color-text-on-dark);
+  line-height: var(--leading-relaxed);
+  max-width: 60ch;
+  /* padding-top: var(--space-4); */
+  /* border-top: 1px solid rgba(255, 255, 255, 0.1); */
+}
+
 .footer__copy {
   font-size: var(--text-12);
   color: rgba(255, 255, 255, 0.3);
