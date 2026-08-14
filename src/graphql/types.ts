@@ -183,6 +183,7 @@ export interface FgTestimonials {
   testimonialsItems?:      TestimonialItem[] | null
   testimonialsFbLinkLabel?: string | null
   testimonialsFbLinkUrl?:  string | null
+  legalNotice?:            string | null
 }
 
 // ── fgFaq (fg_faq) ───────────────────────────────────────────────────────────

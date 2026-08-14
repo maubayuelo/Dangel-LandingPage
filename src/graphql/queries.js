@@ -154,6 +154,7 @@ export const GET_PAGE = gql`
         testimonialsItems { tsName tsQuote tsService tsDate tsOriginalLang }
         testimonialsFbLinkLabel
         testimonialsFbLinkUrl
+        legalNotice
       }
 
       # ── FAQ ─────────────────────────────────────────────────────────────────

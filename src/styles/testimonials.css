@@ -112,6 +112,14 @@
 }
 .testimonials__fb-link:hover { text-decoration: underline; }
 
+.testimonials__legal {
+  font-family: var(--font-body);
+  font-size: var(--text-11);
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: var(--space-3);
+}
+
 /* ── Tablet: 2-col grid ── */
 @media (min-width: 768px) and (max-width: 1023px) {
   .testimonials__grid {

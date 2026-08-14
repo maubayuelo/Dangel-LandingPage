@@ -75,6 +75,10 @@ export default function Testimonials({ data: d, lang = 'fr' }) {
             </a>
           </div>
         )}
+
+        {d.legalNotice && (
+          <p className="testimonials__legal">{d.legalNotice}</p>
+        )}
       </div>
     </section>
   )
