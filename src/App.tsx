@@ -33,6 +33,7 @@ import { useLanguage } from './hooks/useLanguage'
 import { useRoute } from './hooks/useRoute'
 // Loading skeleton styles — the animated grey bars shown while GraphQL fetches
 import './styles/loading-skeleton.css'
+import Fallback from './components/Fallback'
 import { useAnalytics } from './hooks/useAnalytics'
 import { useDocumentHead } from './hooks/useDocumentHead'
 import { LANG_PAGE_URIS } from './lib/urls'
@@ -94,7 +95,7 @@ export default function App() {
   // From this point on, `data.page.fgFAQ` is a compile-time error (correct: fgFaq).
   // Any field name typo that would silently return undefined at runtime is now
   // caught here, before the code ever runs.
-  const { data, loading, error } = useQuery<{ page: PageData }>(GET_PAGE, {
+  const { data, loading, error, refetch } = useQuery<{ page: PageData }>(GET_PAGE, {
     variables: { pageId: LANG_PAGE_URIS[lang] || '/home/' },
   })
 
@@ -198,19 +199,13 @@ export default function App() {
     </div>
   )
 
-  // ERROR: friendly message in French
-  //   This only shows when the GraphQL request itself fails entirely (network
-  //   error, server down, completely broken query). Normal section-level issues
-  //   are caught by the per-section <ErrorBoundary> wrappers instead.
-  if (error) return (
-    <div style={{ minHeight: '100vh', background: 'var(--cream)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-8)' }}>
-      <p style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-body)', textAlign: 'center' }}>
-        Impossible de charger le contenu. Veuillez réessayer.
-        {/* Technical error message — small and dim, helpful for debugging */}
-        <br />
-        <span style={{ fontSize: '0.8rem', color: 'var(--text-dimmer)' }}>{error.message}</span>
-      </p>
-    </div>
+  // ERROR / NO DATA: the whole site depends on this one query, so a visitor
+  // arriving from a paid ad must never see a blank screen here. <Fallback>
+  // is fully self-contained (hardcoded copy + contact info, no GraphQL) —
+  // see components/Fallback.jsx. This covers both an outright request failure
+  // (network/CORS/server down) and a response with no page for this pageId.
+  if (error || (!loading && !p)) return (
+    <Fallback lang={lang} onRetry={() => refetch()} />
   )
 
   // ── Main render ───────────────────────────────────────────────────────────────
