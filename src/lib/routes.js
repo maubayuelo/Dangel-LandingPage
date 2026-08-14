@@ -3,9 +3,9 @@
 //
 // The public policy URL for each language, one slug segment appended to the
 // language prefix already defined in lib/urls.js:
-//   en → /en/privacy-policy
-//   fr → /fr/politique-de-confidentialite
-//   es → /es/politica-de-confidencialidad
+//   en → /en/legal-notice
+//   fr → /fr/mentions-legales
+//   es → /es/aviso-legal
 //
 // These slugs match the real WordPress page slugs (see LANG_POLICY_URIS in
 // urls.js) so there's only one translation table to keep in sync, not two.
@@ -17,9 +17,9 @@
 import { SITE_ORIGIN, LANG_PATHS } from './urls'
 
 export const POLICY_SLUGS = {
-  en: 'privacy-policy',
-  fr: 'politique-de-confidentialite',
-  es: 'politica-de-confidencialidad',
+  en: 'legal-notice',
+  fr: 'mentions-legales',
+  es: 'aviso-legal',
 }
 
 export function policyPathFor(lang) {

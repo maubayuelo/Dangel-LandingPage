@@ -16,7 +16,7 @@ export default function Nav({ data: d, lang, onLangChange, onBook }) {
   const logoSrc = d?.navLogoImage?.node?.sourceUrl
 
   // Section anchors (#services, #about, ...) only exist on the home view —
-  // on the policy page (/en/privacy-policy etc.) that <main> isn't mounted.
+  // on the policy page (/en/legal-notice etc.) that <main> isn't mounted.
   // Navigate home first when needed, then scroll once it has re-rendered.
   const scrollTo = (anchor) => {
     const id = anchor.replace('#', '')

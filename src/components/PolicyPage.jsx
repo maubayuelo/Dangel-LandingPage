@@ -3,7 +3,7 @@ import { usePolicyPage } from '../hooks/usePolicyPage'
 import PolicyContent from './PolicyContent'
 import { t } from '../lib/i18n'
 
-// The public, crawlable /privacy-policy route (see lib/routes.js). Renders
+// The public, crawlable /legal-notice route (see lib/routes.js). Renders
 // the same <PolicyContent> as PolicyModal — the modal is a quick preview
 // from the cookie banner, this page is the real, indexable document Meta
 // and Google expect a link to point to.

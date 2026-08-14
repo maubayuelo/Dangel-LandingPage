@@ -7,7 +7,7 @@ import { t } from '../lib/i18n'
 
 // Props: isOpen (bool), onClose (fn), lang — content is fetched here
 // (usePolicyPage) and rendered via the same <PolicyContent> the public
-// /privacy-policy route uses, so the two never drift apart.
+// /legal-notice route uses, so the two never drift apart.
 export default function PolicyModal({ isOpen, onClose, lang }) {
   const overlayRef = useRef(null)
   const closeRef = useRef(null)

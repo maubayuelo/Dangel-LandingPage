@@ -26,7 +26,7 @@ export const LANG_PATHS = { en: '/en', fr: '/fr', es: '/es' }
 export const LANG_PAGE_URIS = { en: '/home/', fr: '/fr/accueil/', es: '/es/inicio/' }
 
 export const LANG_POLICY_URIS = {
-  en: '/privacy-policy/',
-  fr: '/fr/politique-de-confidentialite/',
-  es: '/es/politica-de-confidencialidad/',
+  en: '/legal-notice/',
+  fr: '/fr/mentions-legales/',
+  es: '/es/aviso-legal/',
 }

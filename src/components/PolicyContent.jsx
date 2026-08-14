@@ -2,7 +2,7 @@
 // components/PolicyContent.jsx — SHARED POLICY BODY
 //
 // Rendered identically by PolicyModal.jsx (quick preview from the cookie
-// banner) and PolicyPage.jsx (the public, crawlable /privacy-policy route).
+// banner) and PolicyPage.jsx (the public, crawlable /legal-notice route).
 // One component, one markup — never duplicated.
 // ─────────────────────────────────────────────────────────────────────────────
 

@@ -237,7 +237,7 @@ export default function App() {
       />
 
       {/* Two views only: the landing page, or the public policy route
-          (/en/privacy-policy etc. — see lib/router.js). Nav/Footer/modals
+          (/en/legal-notice etc. — see lib/router.js). Nav/Footer/modals
           stay mounted across both so navigation and consent state persist. */}
       {view === 'policy' ? (
         <ErrorBoundary><PolicyPage lang={lang} /></ErrorBoundary>

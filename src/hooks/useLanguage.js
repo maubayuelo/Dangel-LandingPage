@@ -28,9 +28,9 @@ const STORAGE_KEY = 'dangel_lang'
 
 // ── Helper: read language from the URL path ──────────────────────────────────
 // Only the FIRST path segment is ever a language code — everything after it
-// (e.g. "politique-de-confidentialite" in /fr/politique-de-confidentialite)
+// (e.g. "mentions-legales" in /fr/mentions-legales)
 // is route content, not language, and must never be mistaken for one.
-// "/" → [] → null. "/fr" or "/fr/" → 'fr'. "/es/politica-..." → 'es'.
+// "/" → [] → null. "/fr" or "/fr/" → 'fr'. "/es/aviso-legal" → 'es'.
 function getLangFromPath() {
   const first = window.location.pathname.split('/').filter(Boolean)[0]
   return SUPPORTED.includes(first) ? first : null
@@ -70,7 +70,7 @@ export function useLanguage() {
 
     // Translate the URL, not just the language: if we're on the policy page,
     // switching language must land on that page's translation
-    // (/fr/politique-de-confidentialite → /es/politica-de-confidencialidad),
+    // (/fr/mentions-legales → /es/aviso-legal),
     // not bounce back to the home page. router.navigate() also fires
     // 'dangel:routechange', so useRoute() re-evaluates the view immediately.
     const targetPath = getView() === 'policy' ? policyPathFor(newLang) : LANG_PATHS[newLang]

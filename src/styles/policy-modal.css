@@ -245,7 +245,7 @@
   opacity: 0.9;
 }
 
-/* ── PolicyPage — the public /privacy-policy route ─────────────────────── */
+/* ── PolicyPage — the public /legal-notice route ─────────────────────── */
 .policy-page {
   background: var(--cream);
   padding-block: var(--section-py);
