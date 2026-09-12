@@ -1,5 +1,7 @@
 # Dangel — Landing Page
 
+[![CI](https://github.com/maubayuelo/Dangel-LandingPage/actions/workflows/ci.yml/badge.svg)](https://github.com/maubayuelo/Dangel-LandingPage/actions/workflows/ci.yml)
+
 Landing page for **Dangel, Thérapeute Holistique**. A single-page marketing site built with React + Vite, consuming content from a WordPress backend through GraphQL.
 
 ---
