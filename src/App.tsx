@@ -35,6 +35,7 @@ import { useRoute } from './hooks/useRoute'
 import './styles/loading-skeleton.css'
 import Fallback from './components/Fallback'
 import { useAnalytics } from './hooks/useAnalytics'
+import { trackEvent } from './utils/analytics'
 import { useDocumentHead } from './hooks/useDocumentHead'
 import { LANG_PAGE_URIS } from './lib/urls'
 import { policyPathFor } from './lib/routes'
@@ -141,8 +142,16 @@ export default function App() {
   // Arrow functions assigned to variables — these are passed as callback props
   // (onBook, onClose) to child components. The child calls onBook() and the
   // state lives here in App, not inside the button component.
-  const openModal = () => setModalOpen(true)
   const closeModal = () => setModalOpen(false)
+
+  // Every booking CTA routes through here so we can attribute which section
+  // drove the click. `location` is a fixed string per CTA (see onBook props
+  // below). trackEvent no-ops unless analytics consent was granted (gtag
+  // undefined otherwise), so this respects the Loi 25 gate.
+  const openBooking = (location: string) => {
+    trackEvent('book_click', { cta_location: location, language: lang })
+    setModalOpen(true)
+  }
 
   const openPolicy = () => setPolicyOpen(true)
   const closePolicy = () => setPolicyOpen(false)
@@ -228,7 +237,7 @@ export default function App() {
         data={p?.fgNavigation}
         lang={lang}
         onLangChange={changeLang}
-        onBook={openModal}
+        onBook={() => openBooking('nav')}
       />
 
       {/* Two views only: the landing page, or the public policy route
@@ -244,15 +253,15 @@ export default function App() {
             leaves every other section on screen. Without these wrappers, one
             broken section would make the entire <main> disappear. */
         <main>
-          <ErrorBoundary><Hero data={p?.fgHero} onBook={openModal} /></ErrorBoundary>
+          <ErrorBoundary><Hero data={p?.fgHero} onBook={() => openBooking('hero')} /></ErrorBoundary>
           <ErrorBoundary><Benefits data={p?.fgBenefits} /></ErrorBoundary>
-          <ErrorBoundary><Services data={p?.fgServices} onBook={openModal} /></ErrorBoundary>
+          <ErrorBoundary><Services data={p?.fgServices} onBook={() => openBooking('services')} /></ErrorBoundary>
           <ErrorBoundary><Process data={p?.fgProcess} /></ErrorBoundary>
-          <ErrorBoundary><About data={p?.fgAbout} onBook={openModal} /></ErrorBoundary>
+          <ErrorBoundary><About data={p?.fgAbout} onBook={() => openBooking('about')} /></ErrorBoundary>
           <ErrorBoundary><Testimonials data={p?.fgTestimonials} lang={lang} /></ErrorBoundary>
           <ErrorBoundary><FAQ data={p?.fgFaq} /></ErrorBoundary>
           <ErrorBoundary><Contact data={p?.fgContact} onOpenPolicy={openPolicy} lang={lang} /></ErrorBoundary>
-          <ErrorBoundary><CtaFinal data={p?.fgCtaFinal} onBook={openModal} /></ErrorBoundary>
+          <ErrorBoundary><CtaFinal data={p?.fgCtaFinal} onBook={() => openBooking('cta_final')} /></ErrorBoundary>
         </main>
       )}
 
