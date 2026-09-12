@@ -2,6 +2,7 @@ import { useState } from 'react'
 import emailjs from '@emailjs/browser'
 import '../styles/contact.css'
 import { t } from '../lib/i18n'
+import { trackEvent } from '../utils/analytics'
 
 const EJS_SERVICE       = import.meta.env.VITE_EMAILJS_SERVICE_ID
 const EJS_TEMPLATE      = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
@@ -44,6 +45,10 @@ export default function Contact({ data: d, onOpenPolicy, lang }) {
         emailjs.send(EJS_SERVICE, EJS_TEMPLATE, params, EJS_KEY),
       ])
       setSent(true)
+      // GA4 key event — fires only after both emails actually sent. Not on
+      // validation block, not on failure. gtag is undefined unless analytics
+      // consent was granted, so trackEvent no-ops when consent was declined.
+      trackEvent('generate_lead', { form_location: 'contact', language: lang })
     } catch (err) {
       console.error('EmailJS error:', err)
       setError('Une erreur est survenue. Veuillez réessayer.')
