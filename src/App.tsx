@@ -62,6 +62,17 @@ import BackToTop from './components/BackToTop'
 // instead of crashing the whole page. See components/ErrorBoundary.jsx.
 import ErrorBoundary from './components/ErrorBoundary'
 
+// useLanguage() (a plain .js hook) returns `lang` as a bare `string`, but
+// LANG_PAGE_URIS only has keys for the languages we actually support. This
+// guard narrows `string` to a valid key before indexing, so an unsupported
+// value falls through to the `'/home/'` default instead of type-widening the
+// lookup to `any`.
+type LangPageKey = keyof typeof LANG_PAGE_URIS
+
+function isLangPageKey(value: string): value is LangPageKey {
+  return value in LANG_PAGE_URIS
+}
+
 // "export default" means other files can import this as any name they choose.
 // function App() {} is a React "function component" — a plain JS function that
 // returns JSX (HTML-like syntax that React compiles to real DOM elements).
@@ -97,7 +108,7 @@ export default function App() {
   // Any field name typo that would silently return undefined at runtime is now
   // caught here, before the code ever runs.
   const { data, loading, error, refetch } = useQuery<{ page: PageData }>(GET_PAGE, {
-    variables: { pageId: LANG_PAGE_URIS[lang] || '/home/' },
+    variables: { pageId: (isLangPageKey(lang) ? LANG_PAGE_URIS[lang] : undefined) || '/home/' },
   })
 
   // ── Shorthand aliases ────────────────────────────────────────────────────────
